@@ -4,7 +4,7 @@ from peewee import *
 
 from methods.configs import bot_static_token
 
-heroku = False
+heroku = True
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 DATABASE = os.path.join(PROJECT_ROOT, 'db', 'people.sqlite')
 db3 = SqliteDatabase(DATABASE)
