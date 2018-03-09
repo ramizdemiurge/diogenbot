@@ -2,7 +2,7 @@ import os
 from peewee import *
 
 embedded_database = False
-init_bot_tables = False
+init_bot_tables = True
 
 banned_words = ["@", "http", ".com", "казино", "выигр"]
 # Web hook
