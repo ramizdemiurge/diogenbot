@@ -1,36 +1,8 @@
-import os
-
 from peewee import *
 
-from methods.configs import bot_static_token
+from model.config import bot_database, init_bot_tables
 
-heroku = True
-PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
-DATABASE = os.path.join(PROJECT_ROOT, 'db', 'people.sqlite')
-db3 = SqliteDatabase(DATABASE)
-db_proxy = Proxy()
-
-# import logging
-# logger = logging.getLogger('peewee')
-# logger.setLevel(logging.DEBUG)
-# logger.addHandler(logging.StreamHandler())
-
-bot_token = None
-if heroku:
-    bot_token = os.environ["token"]
-    print("Trying to use heroku-postgresql database")
-    import urllib.parse, psycopg2
-
-    urllib.parse.uses_netloc.append('postgres')
-    url = urllib.parse.urlparse(os.environ["DATABASE_URL"])
-    db = PostgresqlDatabase(database=url.path[1:], user=url.username, password=url.password, host=url.hostname,
-                            port=url.port, autocommit=True,
-                            autorollback=True)
-else:
-    bot_token = bot_static_token
-    print("Using local stored sqlite")
-    db = db3
-    db_proxy.initialize(db)
+db = bot_database
 
 
 class UserLogs(Model):
@@ -65,9 +37,9 @@ class User(Model):
 class Settings(Model):
     # id = IntegerField(primary_key=True)
     delete_messages = BooleanField(default=False)
-    delete_messages_seconds = IntegerField(default=2)
+    delete_messages_seconds = IntegerField(default=0)
     delete_stickers = BooleanField(default=False)
-    delete_stickers_seconds = IntegerField(default=2)
+    delete_stickers_seconds = IntegerField(default=0)
     antibot_count = IntegerField(default=5)
     stickers_count = IntegerField(default=0)
 
@@ -102,7 +74,9 @@ def init_tables():
         Groups.create_table()
         AdminList.create_table()
     except Exception:
+        print("Error creating database. Maybe it exists?")
         pass
 
 
-init_tables()
+if init_bot_tables:
+    init_tables()

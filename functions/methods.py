@@ -1,10 +1,8 @@
-# from telegram import User
 import datetime
 
-from Model import AdminList, Groups, Settings, UserLogs, User
-from methods.djaler_utils import get_username_or_name, get_username_or_name_sb
-
-banned_words = ["@", "http", ".com", "казино", "выигр"]
+from functions.djaler_utils import get_username_or_name_sb, get_username_or_name
+from model.config import banned_words
+from model.database_model import UserLogs, User, AdminList, Groups, Settings
 
 
 def spam_cheker(message):
@@ -14,7 +12,45 @@ def spam_cheker(message):
     return False
 
 
-# user_from_db - peewee class | user_new - telegram class
+def get_user(bot, update):
+    _chat_id = update.message.chat.id
+    _user = update.message.from_user
+    _username = None
+    _first_name = None
+    _last_name = None
+
+    if update.message.from_user.username:
+        _username = update.message.from_user.username
+    if update.message.from_user.first_name:
+        _first_name = update.message.from_user.first_name
+    if update.message.from_user.last_name:
+        _last_name = update.message.from_user.last_name
+
+    user_query = User.select().where(User.chat_id == _chat_id, User.user_id == _user.id)
+    if user_query.exists():
+        user_object = user_query.first()
+        changes_detector(user_object, update, bot)
+        return user_object
+
+    else:
+        user_object = User.create(user_id=update.message.from_user.id, first_name=_first_name,
+                                  last_name=_last_name, chat_id=_chat_id, t_username=_username,
+                                  last_activity=datetime.datetime.now())
+        user_object = user_query.first()
+        return user_object
+
+
+def get_group(bot, update):
+    _chat_id = update.message.chat.id
+    group_query = Groups.select().where(Groups.chat_id == _chat_id)
+    if not group_query.exists():
+        bot.send_message(_chat_id, "Чат не зарегистрирован в базе бота. Обратитесь к @abdullaeff"
+                                   "\nchatid: " + str(_chat_id))
+        return
+    else:
+        return group_query.first()
+
+
 def changes_detector(user_from_db, update, bot):
     _user = update.message.from_user
     _chat_id = update.message.chat.id
@@ -149,19 +185,23 @@ def super_admin_method(bot, update):
                     if group_query.exists():
                         group = group_query.first()
                         group.delete_instance()
-                        update.message.reply_text("Чат был удален.")
+                        deleted_users = User.delete().where(User.chat_id == group.chat_id)
+                        deleted_logs = UserLogs.delete().where(UserLogs.chat_id == group.chat_id)
+
+                        deleted_user_count = deleted_users.execute()
+                        update.message.reply_text("Чат был удален.\n"
+                                                  "Удалено пользователей: " + str(deleted_user_count) +
+                                                  "\nЖурнал: ")
                     else:
                         update.message.reply_text("Этот чат не зарегистрирован.")
-
-
-        except FileExistsError:
+        except Exception:
             update.message.reply_text("Exception. Do your best.")
 
 
 def user_cmds(user, update, text):
     _chat_id = update.message.chat.id
     _user = update.message.from_user
-    _text = update.message.text
+    _text = text
     _text_array = _text.split()
     try:
         if len(_text_array) >= 2:
@@ -174,6 +214,7 @@ def user_cmds(user, update, text):
                     _chat_id) + ", рейтинг: " + \
                          str("%.2f" % rating_value)
                 update.message.reply_text(answer)
+                return True
         pass
     except Exception:
         update.message.reply_text("Exception. Do your best.")
@@ -247,5 +288,5 @@ def reply_cmds(update, bot):
                                          _reply_user))
                 return True
 
-    except FileExistsError:
+    except Exception:
         update.message.reply_text("Exception. Do your best.")

@@ -1,1 +1,0 @@
-bot_static_token = ""
