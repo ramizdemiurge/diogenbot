@@ -38,12 +38,10 @@ class Bot:
         self._updater.dispatcher.add_handler(MessageHandler(Filters.sticker, self._group_sticker_handler))
 
     def _cmd_handler_group(self, bot, update, groups):
-        print("_cmd_handler_group")
         _user_id = update.message.from_user.id
         _chat_id = update.message.chat.id
         if _user_id != _chat_id:
             if _user_id == _admin_id:
-                print("_user_id == _admin_id")
                 super_admin_method(bot, update)
 
             group = get_group(bot, update)
@@ -62,7 +60,6 @@ class Bot:
                     admin_method(bot, update, settings_object)
 
     def _group_message_handler(self, bot, update):
-        print("_message_handler_in_group")
         _chat_id = update.message.chat.id
         _message_id = update.message.message_id
         group = get_group(bot, update)
@@ -87,7 +84,6 @@ class Bot:
         user_object.save()
 
     def _message_handler(self, bot, update):
-        print("_message_handler")
         _user_id = update.message.from_user.id
         admin_query = AdminList.select().where(AdminList.user_id == _user_id)
         if admin_query.exists() or _user_id == _admin_id:
@@ -122,7 +118,6 @@ class Bot:
             update.message.reply_text("Человек! Где человек?")
 
     def _group_sticker_handler(self, bot, update):
-        print("_stickers_handler_in_group")
         group = get_group(bot, update)
         if not group:
             return
