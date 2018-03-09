@@ -11,7 +11,7 @@ PORT = int(os.environ.get('PORT', '5000'))
 
 # telegram
 TOKEN = os.getenv("token")
-ENV = ""
+ENV = os.environ.get("ENV", "dev")
 _admin_id = 76114490
 # Database
 
