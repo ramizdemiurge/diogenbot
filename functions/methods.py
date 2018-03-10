@@ -1,6 +1,6 @@
 import datetime
 
-from functions.djaler_utils import get_username_or_name_sb, get_username_or_name
+from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
 from model.config import banned_words
 from model.database_model import UserLogs, User, AdminList, Groups, Settings
 
@@ -79,7 +79,8 @@ def changes_detector(user_from_db, update, bot):
         user_from_db.save()
         UserLogs.create(user_id=_user.id, chat_id=_chat_id, text=log_string, date=datetime.datetime.now())
         if update.message:
-            update.message.reply_text("Изменения:\n" + log_string)
+            # update.message.reply_text("Изменения:\n" + log_string)
+            update.message.reply_text(choice_variant_from_file('changes.txt'))
 
 
 def admin_method(bot, update, settings):
@@ -234,12 +235,11 @@ def reply_cmds(update, bot):
         else:
             if _text == "/log":
                 answer = ""
+
+                users = UserLogs.select().where(UserLogs.user_id == _reply_user.id,
+                                                UserLogs.chat_id == _chat_id).order_by(UserLogs.date.desc()).limit(5)
                 counter = 1
-                users = UserLogs.select().where(UserLogs.user_id == _reply_user.id, UserLogs.chat_id == _chat_id).order_by(UserLogs.date.desc())
-                users.execute()
                 for log in users:
-                    if counter > 5:
-                        break
                     date = log.date
                     answer += str(counter) + ") " + str(log.text) + " [" + str(date.strftime('%d %b %Y, %H:%M')) + "]\n"
                     counter += 1
