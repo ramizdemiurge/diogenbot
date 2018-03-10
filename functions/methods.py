@@ -310,7 +310,7 @@ def reply_cmds(update, bot):
                     except Exception:
                         pass
                     bot.send_message(_chat_id,
-                                     "🙂 " + get_username_or_name(_user) + " поблагодарил " + get_username_or_name(
+                                     "🙂" + get_username_or_name(_user) + " поблагодарил " + get_username_or_name(
                                          _reply_user))
                 return True
             elif _text == "/ban":
@@ -326,7 +326,7 @@ def reply_cmds(update, bot):
                     except Exception:
                         pass
                     bot.send_message(_chat_id,
-                                     "😡 " + get_username_or_name(_user) + " поругал " + get_username_or_name(
+                                     "😡" + get_username_or_name(_user) + " поругал " + get_username_or_name(
                                          _reply_user))
                 return True
 
