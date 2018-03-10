@@ -1,15 +1,49 @@
 import datetime
 
 from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
-from model.config import banned_words
+from model.config import banned_words, thank_words
 from model.database_model import UserLogs, User, AdminList, Groups, Settings
 
 
+def inbox(update):
+    _user_id = update.message.from_user.id
+    _chat_id = update.message.chat.id
+    if _user_id == _chat_id:
+        return True
+    else:
+        return False
+
+
 def spam_cheker(message):
+    message = message.lower()
     for x in banned_words:
         if x in message:
             return True
     return False
+
+
+def thanks_checkers(message):
+    message = message.lower()
+    for x in thank_words:
+        if x in message:
+            return True
+    return False
+
+
+def thanks_detector(update):
+    _message = update.message
+    _chat_id = _message.chat.id
+    _user = _message.from_user
+    _reply_user = _message.reply_to_message.from_user
+    _text = _message.text
+    if thanks_checkers(_text):
+        if _reply_user.id == _user.id:
+            return
+        user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id)
+        if user_query.exists():
+            user_object = user_query.first()
+            user_object.rating_plus += 1
+            user_object.save()
 
 
 def get_user(bot, update):
@@ -213,8 +247,15 @@ def user_cmds(user, update, text):
                 answer = "Сообщений: " + str(user.messages_count) + ", изменений в профиле: " + str(
                     user.changes_count) + ", идентификатор: " + str(_user.id) + ", чат: " + str(
                     _chat_id) + ", рейтинг: " + \
-                         str("%.2f" % rating_value)
+                         str("%.1f" % rating_value)
                 update.message.reply_text(answer)
+                return True
+            if "/info" in _text:
+                user_query = User.select().where(User.user_id == _user.id, User.chat_id == _chat_id)
+                if user_query.exists():
+                    user_object = user_query.first()
+                    rating_value = float(user_object.rating_plus / user_object.rating_minus)
+                    update.message.reply_text("Ваш рейтинг: " + str("%.1f" % rating_value))
                 return True
         pass
     except Exception as e:
@@ -291,3 +332,5 @@ def reply_cmds(update, bot):
 
     except Exception as e:
         update.message.reply_text("Exception: " + str(e))
+
+
