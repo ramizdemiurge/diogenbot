@@ -289,7 +289,7 @@ def reply_cmds(update, bot):
                 else:
                     update.message.reply_text("Журнал пуст.")
                 return True
-            elif _text == "/info":
+            elif "/info" in _text:
                 user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id)
                 if user_query.exists():
                     user_object = user_query.first()
