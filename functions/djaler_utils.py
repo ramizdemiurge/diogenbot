@@ -1,4 +1,6 @@
 # import supycache
+from random import choice
+
 from telegram import Bot, User
 
 
@@ -27,3 +29,9 @@ def get_username_or_name_sb(user: User):
     if user.last_name:
         return '%s %s' % (user.first_name, user.last_name)
     return user.first_name
+
+
+def choice_variant_from_file(file_name):
+    with open('modules/responses/%s' % file_name) as file:
+        variant = choice(file.read().splitlines())
+    return variant
