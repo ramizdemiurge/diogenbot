@@ -134,8 +134,8 @@ def admin_method(bot, update, settings):
                     settings.delete_messages = False
                     settings.save()
                     bot.send_message(_chat_id, get_username_or_name(_user) + " отменил тишину...")
-    except Exception:
-        update.message.reply_text("Exception. Do your best.")
+    except Exception as e:
+        update.message.reply_text("Exception " + str(e))
 
 
 def super_admin_method(bot, update):
@@ -194,8 +194,8 @@ def super_admin_method(bot, update):
                                                   "\nЖурнал: ")
                     else:
                         update.message.reply_text("Этот чат не зарегистрирован.")
-        except Exception:
-            update.message.reply_text("Exception. Do your best.")
+        except Exception as e:
+            update.message.reply_text("Exception " + str(e))
 
 
 def user_cmds(user, update, text):
@@ -216,8 +216,8 @@ def user_cmds(user, update, text):
                 update.message.reply_text(answer)
                 return True
         pass
-    except Exception:
-        update.message.reply_text("Exception. Do your best.")
+    except Exception as e:
+        update.message.reply_text("Exception: " + str(e))
     pass
 
 
@@ -235,12 +235,13 @@ def reply_cmds(update, bot):
             if _text == "/log":
                 answer = ""
                 counter = 1
-                for log in UserLogs.select().order_by(UserLogs.date.desc()).dicts() \
-                        .where(UserLogs.user_id == _reply_user.id, UserLogs.chat_id == _chat_id):
+                users = UserLogs.select().where(UserLogs.user_id == _reply_user.id, UserLogs.chat_id == _chat_id).order_by(UserLogs.date.desc())
+                users.execute()
+                for log in users:
                     if counter > 5:
                         break
-                    date = datetime.datetime.fromtimestamp(log['date'] / 1e3)
-                    answer += str(counter) + ") " + str(log['text']) + " [" + str(date) + "]" + "\n"
+                    date = log.date
+                    answer += str(counter) + ") " + str(log.text) + " [" + str(date.strftime('%d %b %Y, %H:%M')) + "]\n"
                     counter += 1
                 if answer != "":
                     update.message.reply_text(answer)
@@ -288,5 +289,5 @@ def reply_cmds(update, bot):
                                          _reply_user))
                 return True
 
-    except Exception:
-        update.message.reply_text("Exception. Do your best.")
+    except Exception as e:
+        update.message.reply_text("Exception: " + str(e))

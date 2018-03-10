@@ -2,7 +2,7 @@ import datetime
 from time import sleep
 
 import requests
-from telegram.ext import RegexHandler, Updater, MessageHandler, Filters
+from telegram.ext import RegexHandler, Updater, MessageHandler, Filters, CommandHandler
 
 from functions.djaler_utils import get_username_or_name_sb, is_user_group_admin
 from functions.methods import get_user, admin_method, get_group, super_admin_method, spam_cheker, reply_cmds, user_cmds
@@ -37,7 +37,8 @@ class Bot:
         self._updater.dispatcher.add_handler(MessageHandler(Filters.text, self._message_handler))
         self._updater.dispatcher.add_handler(MessageHandler(Filters.sticker, self._group_sticker_handler))
 
-    def _cmd_handler_group(self, bot, update, groups):
+    @staticmethod
+    def _cmd_handler_group(bot, update, groups):
         _user_id = update.message.from_user.id
         _chat_id = update.message.chat.id
         if _user_id != _chat_id:
