@@ -5,7 +5,9 @@ import requests
 from telegram.ext import RegexHandler, Updater, MessageHandler, Filters, CommandHandler
 
 from functions.djaler_utils import get_username_or_name_sb, is_user_group_admin
-from functions.methods import get_user, admin_method, get_group, super_admin_method, spam_cheker, reply_cmds, user_cmds
+from functions.handlers import help_command_handler
+from functions.methods import get_user, admin_method, get_group, super_admin_method, spam_cheker, reply_cmds, user_cmds, \
+    thanks_detector
 from model.config import URL, PORT, ENV, TOKEN, _admin_id
 from model.database_model import AdminList, UserLogs, User, Groups
 
@@ -32,10 +34,10 @@ class Bot:
             self._updater.start_polling(poll_interval=1)
 
     def _init_handlers(self):
+        self._updater.dispatcher.add_handler(CommandHandler('help', help_command_handler))
         self._updater.dispatcher.add_handler(RegexHandler("\/.*", self._cmd_handler_group, pass_groups=True))
         self._updater.dispatcher.add_handler(MessageHandler(Filters.group, self._group_message_handler))
         self._updater.dispatcher.add_handler(MessageHandler(Filters.text, self._message_handler))
-        self._updater.dispatcher.add_handler(MessageHandler(Filters.sticker, self._group_sticker_handler))
 
     @staticmethod
     def _cmd_handler_group(bot, update, groups):
@@ -63,6 +65,9 @@ class Bot:
     def _group_message_handler(self, bot, update):
         _chat_id = update.message.chat.id
         _message_id = update.message.message_id
+        if update.message.sticker:
+            self._group_sticker_handler(bot, update)
+            return
         group = get_group(bot, update)
         if not group:
             return
@@ -78,7 +83,12 @@ class Bot:
                 bot.delete_message(chat_id=_chat_id, message_id=_message_id)
                 return
         else:
+
             user_cmds(user_object, update, update.message.text)
+            if update.message.reply_to_message is None:
+                pass
+            else:
+                thanks_detector(update)
 
         user_object.messages_count += 1
         user_object.last_activity = datetime.datetime.now()
