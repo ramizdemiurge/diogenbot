@@ -5,6 +5,7 @@ embedded_database = False
 init_bot_tables = True
 
 banned_words = ["@", "http", ".com", "казино", "выигр"]
+thank_words = ["пасиб", "спс", "благодар"]
 # Web hook
 URL = os.environ.get("URL")
 PORT = int(os.environ.get('PORT', '5000'))
@@ -13,6 +14,7 @@ PORT = int(os.environ.get('PORT', '5000'))
 TOKEN = os.getenv("token")
 ENV = os.environ.get("ENV", "dev")
 _admin_id = 76114490
+
 # Database
 
 db_proxy = Proxy()
