@@ -43,10 +43,11 @@ class Bot:
     def _cmd_handler_group(bot, update, groups):
         _user_id = update.message.from_user.id
         _chat_id = update.message.chat.id
-        if _user_id != _chat_id:
-            if _user_id == _admin_id:
-                super_admin_method(bot, update)
+        if _user_id == _admin_id:
+            if super_admin_method(bot, update):
+                return
 
+        if _user_id != _chat_id:
             group = get_group(bot, update)
             if group:
                 user_object = get_user(bot, update)
