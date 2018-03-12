@@ -217,17 +217,29 @@ def super_admin_method(bot, update):
             #     pass
             else:
                 if _text == "/chats":
-                    Groups.select()
+                    groups = Groups.select()
+                    answer = ""
+                    counter = 1
+                    for group in groups:
+                        name = group.group_name
+                        users_count = User.select().where(User.chat_id == group.chat_id).count()
+                        answer += str(counter) + ". " + name + " [users: " + str(users_count) + "]\n"
+                        counter += 1
+                    if answer != "":
+                        update.message.reply_text(answer)
+                    else:
+                        update.message.reply_text("Журнал пуст.")
                     return True
                 if _text == "/reg_chat":
-                    group_query = Groups.select().where(Groups.chat_id == _chat_id)
-                    if not group_query.exists():
-                        _settings = Settings.create()
-                        Groups.create(chat_id=_chat_id, settings=_settings, force_insert=True)
-                        update.message.reply_text("Чат был зарегистрирован.")
-                    else:
-                        update.message.reply_text("Чат уже зарегистрирован.")
-                    return True
+                    update.message.reply_text("Задай чату имя.")
+                    # group_query = Groups.select().where(Groups.chat_id == _chat_id)
+                    # if not group_query.exists():
+                    #     _settings = Settings.create()
+                    #     Groups.create(chat_id=_chat_id, settings=_settings, force_insert=True)
+                    #     update.message.reply_text("Чат был зарегистрирован.")
+                    # else:
+                    #     update.message.reply_text("Чат уже зарегистрирован.")
+                    # return True
 
                 if _text == "/del_chat":
                     group_query = Groups.select().where(Groups.chat_id == _chat_id)
