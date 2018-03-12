@@ -39,7 +39,7 @@ def thanks_detector(update):
     if thanks_checkers(_text):
         if _reply_user.id == _user.id:
             return
-        user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id)
+        user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
         if user_query.exists():
             user_object = user_query.first()
             user_object.rating_plus += 1
@@ -94,17 +94,17 @@ def changes_detector(user_from_db, update, bot):
     if _user.username:
         if user_from_db.t_username != _user.username:
             status = True
-            log_string += "uname: " + user_from_db.t_username + " -> " + _user.username + ","
+            log_string += "uname: " + user_from_db.t_username + " → " + _user.username + ","
             user_from_db.t_username = _user.username
     if _user.first_name:
         if user_from_db.first_name != _user.first_name:
             status = True
-            log_string += " fname: " + user_from_db.first_name + " -> " + _user.first_name + ","
+            log_string += " fname: " + user_from_db.first_name + " → " + _user.first_name + ","
             user_from_db.first_name = _user.first_name
     if _user.last_name:
         if user_from_db.last_name != _user.last_name:
             status = True
-            log_string += " lname: " + user_from_db.last_name + " -> " + _user.last_name + ","
+            log_string += " lname: " + user_from_db.last_name + " → " + _user.last_name + ","
             user_from_db.last_name = _user.last_name
 
     if status:
@@ -178,7 +178,7 @@ def super_admin_method(bot, update):
         _chat_id = update.message.chat.id
         _user = update.message.from_user
         _text = update.message.text
-        _text_array = _text.split()
+        _text_array = _text.split(" ")
 
         try:
             if len(_text_array) >= 2:
@@ -202,11 +202,23 @@ def super_admin_method(bot, update):
                 elif _text_array[0] == "/reg_chat":
                     _settings = Settings.create()
                     Groups.create(group_name=_text_array[1], chat_id=_chat_id, settings=_settings, force_insert=True)
+                elif _text_array[0] == "/say":
+                    chat_name = _text_array[1]
+                    group_query = Groups.select().where(Groups.group_name == chat_name).limit(1)
+                    if group_query.exists():
+                        group = group_query.first()
+                        _text_array[0] = _text_array[1] = ""
+                        send_text = "".join([str(x + " ") for x in _text_array])
+                        bot.send_message(group.chat_id, send_text)
+                    else:
+                        update.message.reply_text("Чат не найден.")
+                    return True
             # if len(_text_array) >= 3:
             #     pass
             else:
                 if _text == "/chats":
-                    pass
+                    Groups.select()
+                    return True
                 if _text == "/reg_chat":
                     group_query = Groups.select().where(Groups.chat_id == _chat_id)
                     if not group_query.exists():
@@ -215,6 +227,8 @@ def super_admin_method(bot, update):
                         update.message.reply_text("Чат был зарегистрирован.")
                     else:
                         update.message.reply_text("Чат уже зарегистрирован.")
+                    return True
+
                 if _text == "/del_chat":
                     group_query = Groups.select().where(Groups.chat_id == _chat_id)
                     if group_query.exists():
@@ -226,11 +240,13 @@ def super_admin_method(bot, update):
                         deleted_user_count = deleted_users.execute()
                         update.message.reply_text("Чат был удален.\n"
                                                   "Удалено пользователей: " + str(deleted_user_count) +
-                                                  "\nЖурнал: ")
+                                                  "\nЖурнал: " + str(deleted_logs))
                     else:
                         update.message.reply_text("Этот чат не зарегистрирован.")
+                    return True
         except Exception as e:
-            update.message.reply_text("Exception " + str(e))
+            update.message.reply_text("Exception: " + str(e))
+            return True
 
 
 def user_cmds(user, update, text):
@@ -290,7 +306,7 @@ def reply_cmds(update, bot):
                     update.message.reply_text("Журнал пуст.")
                 return True
             elif "/info" in _text:
-                user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id)
+                user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                 if user_query.exists():
                     user_object = user_query.first()
                     rating_value = float(user_object.rating_plus / user_object.rating_minus)
@@ -300,37 +316,33 @@ def reply_cmds(update, bot):
             elif _text == "/sps":
                 if _reply_user.id == _user.id:
                     return True
-                user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id)
+                user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                 if user_query.exists():
                     user_object = user_query.first()
                     user_object.rating_plus += 1
                     user_object.save()
                     try:
                         bot.delete_message(chat_id=_chat_id, message_id=_message.message_id)
-                    except Exception:
-                        pass
-                    bot.send_message(_chat_id,
-                                     "🙂" + get_username_or_name(_user) + " поблагодарил " + get_username_or_name(
-                                         _reply_user))
+                    except Exception as e:
+                        print("Permission: " + str(e))
+                    bot.send_message(_chat_id, get_username_or_name(_user) + " → 🙂 → " + get_username_or_name(
+                        _reply_user))
                 return True
             elif _text == "/ban":
                 if _reply_user.id == _user.id:
                     return True
-                user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id)
+                user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                 if user_query.exists():
                     user_object = user_query.first()
                     user_object.rating_minus += 1
                     user_object.save()
                     try:
                         bot.delete_message(chat_id=_chat_id, message_id=_message.message_id)
-                    except Exception:
-                        pass
-                    bot.send_message(_chat_id,
-                                     "😡" + get_username_or_name(_user) + " поругал " + get_username_or_name(
-                                         _reply_user))
+                    except Exception as e:
+                        print("Permission: " + str(e))
+                    bot.send_message(_chat_id, get_username_or_name(_user) + " → 😡 → " + get_username_or_name(
+                        _reply_user))
                 return True
 
     except Exception as e:
         update.message.reply_text("Exception: " + str(e))
-
-
