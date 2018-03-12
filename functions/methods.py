@@ -1,7 +1,7 @@
 import datetime
 
 from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
-from model.config import banned_words, thank_words
+from model.lists import banned_words, thank_words
 from model.database_model import UserLogs, User, AdminList, Groups, Settings
 
 
