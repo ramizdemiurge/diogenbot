@@ -4,6 +4,7 @@ from time import sleep
 import pendulum
 import requests
 from telegram.ext import RegexHandler, Updater, MessageHandler, Filters, CommandHandler
+from telegram.ext.dispatcher import run_async
 
 from functions.djaler_utils import get_username_or_name_sb, is_user_group_admin
 from functions.handlers import help_command_handler
@@ -42,7 +43,8 @@ class Bot:
         self._updater.dispatcher.add_handler(MessageHandler(Filters.text, self._message_handler))
 
     @staticmethod
-    def _cmd_handler_group(bot, update, groups):
+    @run_async
+    def _cmd_handler_group(bot, update):
         _user_id = update.message.from_user.id
         _chat_id = update.message.chat.id
         if _user_id == _admin_id or _user_id == _elkhan_id:
@@ -97,7 +99,9 @@ class Bot:
         user_object.last_activity = datetime.datetime.now()
         user_object.save()
 
-    def _message_handler(self, bot, update):
+    @staticmethod
+    @run_async
+    def _message_handler(bot, update):
         _user_id = update.message.from_user.id
         admin_query = AdminList.select().where(AdminList.user_id == _user_id)
         if admin_query.exists() or _user_id == _admin_id:
@@ -131,7 +135,9 @@ class Bot:
             bot.send_message(_admin_id, answer)
             update.message.reply_text("Человек! Где человек?")
 
-    def _group_sticker_handler(self, bot, update):
+    @staticmethod
+    @run_async
+    def _group_sticker_handler(bot, update):
         group = get_group(bot, update)
         if not group:
             return
