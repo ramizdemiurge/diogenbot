@@ -1,4 +1,6 @@
 peewee==2.10.1
 python-telegram-bot==7.0.1
+#humanize==0.5.1
+pendulum
 psycopg2-binary
 requests
