@@ -1,6 +1,7 @@
 import datetime
 from time import sleep
 
+import pendulum
 import requests
 from telegram.ext import RegexHandler, Updater, MessageHandler, Filters, CommandHandler
 
@@ -8,7 +9,7 @@ from functions.djaler_utils import get_username_or_name_sb, is_user_group_admin
 from functions.handlers import help_command_handler
 from functions.methods import get_user, admin_method, get_group, super_admin_method, spam_cheker, reply_cmds, user_cmds, \
     thanks_detector
-from model.config import URL, PORT, ENV, TOKEN, _admin_id
+from model.config import URL, PORT, ENV, TOKEN, _admin_id, _elkhan_id
 from model.database_model import AdminList, UserLogs, User, Groups
 
 
@@ -21,6 +22,7 @@ class Bot:
         self._session = requests.Session()
 
         self._init_handlers()
+        pendulum.set_locale('ru')
 
     def run(self):
         if ENV == "prod":
@@ -43,7 +45,7 @@ class Bot:
     def _cmd_handler_group(bot, update, groups):
         _user_id = update.message.from_user.id
         _chat_id = update.message.chat.id
-        if _user_id == _admin_id:
+        if _user_id == _admin_id or _user_id == _elkhan_id:
             if super_admin_method(bot, update):
                 return
 
