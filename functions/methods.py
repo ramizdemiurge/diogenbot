@@ -1,13 +1,10 @@
 import datetime
 
-import humanize
 import pendulum
 
 from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
 from model.lists import banned_words, thank_words
 from model.database_model import UserLogs, User, AdminList, Groups, Settings
-
-humanize.i18n.activate('ru_RU')
 
 
 def inbox(update):
