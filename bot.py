@@ -42,7 +42,6 @@ class Bot:
         self._updater.dispatcher.add_handler(MessageHandler(Filters.group, self._group_message_handler))
         self._updater.dispatcher.add_handler(MessageHandler(Filters.text, self._message_handler))
 
-    @staticmethod
     @run_async
     def _cmd_handler_group(bot, update):
         _user_id = update.message.from_user.id
