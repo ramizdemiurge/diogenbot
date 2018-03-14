@@ -1,8 +1,13 @@
 import datetime
 
+import humanize
+import pendulum
+
 from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
 from model.lists import banned_words, thank_words
 from model.database_model import UserLogs, User, AdminList, Groups, Settings
+
+humanize.i18n.activate('ru_RU')
 
 
 def inbox(update):
@@ -309,8 +314,8 @@ def reply_cmds(update, bot):
                                                 UserLogs.chat_id == _chat_id).order_by(UserLogs.date.desc()).limit(5)
                 counter = 1
                 for log in users:
-                    date = log.date
-                    answer += str(counter) + ") " + str(log.text) + " [" + str(date.strftime('%d %b %Y, %H:%M')) + "]\n"
+                    date = pendulum.instance(log.date)
+                    answer += "" + str(date.diff_for_humans()) + ":\n" + str(log.text) + "\n\n"
                     counter += 1
                 if answer != "":
                     update.message.reply_text(answer)
@@ -323,7 +328,7 @@ def reply_cmds(update, bot):
                     user_object = user_query.first()
                     rating_value = float(user_object.rating_plus / user_object.rating_minus)
                     bot.send_message(_chat_id, "Рейтинг " + get_username_or_name_sb(
-                        _reply_user) + ": " + str("%.2f" % rating_value))
+                        _reply_user) + ": " + str("%.1f" % rating_value))
                 return True
             elif _text == "/sps":
                 if _reply_user.id == _user.id:
