@@ -14,6 +14,8 @@ TOKEN = os.getenv("token")
 ENV = os.environ.get("ENV", "dev")
 _admin_id = 76114490
 _elkhan_id = 251521119
+_log_chat_id = -1001206590200
+
 
 # Database
 
