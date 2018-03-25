@@ -44,6 +44,7 @@ class Settings(Model):
     delete_stickers_seconds = IntegerField(default=0)
     antibot_count = IntegerField(default=5)
     stickers_count = IntegerField(default=0)
+    spylevel = SmallIntegerField(default=1)
 
     class Meta:
         database = db

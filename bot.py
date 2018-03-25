@@ -77,9 +77,9 @@ class Bot:
         group = get_group(bot, update)
         if not group:
             return
-        interest_detector(bot, update)
         user_object = get_user(bot, update)
         settings_object = group.settings
+        interest_detector(bot, update, settings_object)
         if settings_object.delete_messages:
             if settings_object.delete_messages_seconds > 0:
                 sleep(settings_object.delete_messages_seconds)

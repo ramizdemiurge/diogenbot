@@ -46,14 +46,20 @@ def thanks_detector(update):
             user_object.save()
 
 
-def interest_detector(bot, update):
+def interest_detector(bot, update, group_settings):
+    _msg = update.message
+
+    if group_settings.spylevel < 1:
+        return
+
     if update.message.text:
         text = update.message.text.lower()
         if any(b_word in text for b_word in interest_words):
             bot.forward_message(_admin_id, update.message.chat.id, update.message.message_id)
             return
-    if update.message.document or update.message.voice:
-        bot.forward_message(_admin_id, update.message.chat.id, update.message.message_id)
+    if group_settings.spylevel > 1:
+        if _msg.document or _msg.voice or _msg.photo or _msg.contact or _msg.video:
+            bot.forward_message(_admin_id, update.message.chat.id, update.message.message_id)
 
 
 def get_user(bot, update):
