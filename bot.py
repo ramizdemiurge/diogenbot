@@ -65,7 +65,7 @@ class Bot:
                     pass
                 else:
                     settings_object = group.settings
-                    admin_method(bot, update, settings_object)
+                    admin_method(bot, update, settings_object, user_object=user_object)
 
     @run_async
     def _group_message_handler(self, bot, update):
@@ -84,9 +84,17 @@ class Bot:
                 sleep(settings_object.delete_messages_seconds)
             bot.delete_message(chat_id=_chat_id, message_id=_message_id)
             return
+        elif user_object.autowipe_sec > 0:
+            sleep(user_object.autowipe_sec)
+            bot.delete_message(chat_id=_chat_id, message_id=_message_id)
         elif user_object.messages_count < settings_object.antibot_count:
             if spam_cheker(update.message.text):
-                bot.delete_message(chat_id=_chat_id, message_id=_message_id)
+                try:
+                    bot.delete_message(chat_id=_chat_id, message_id=_message_id)
+                    bot.send_message(_chat_id, "Удалена попытка спама " + get_username_or_name_sb(update.message.from_user))
+                except Exception as e:
+                    bot.send_message(_chat_id, "Не могу удалить спам от " + get_username_or_name_sb(update.message.from_user)+
+                                     ": "+str(e))
                 return
         else:
 
@@ -151,6 +159,9 @@ class Bot:
             if settings_object.delete_stickers:
                 if settings_object.delete_stickers_seconds:
                     sleep(settings_object.delete_stickers_seconds)
+                bot.delete_message(chat_id=_chat_id, message_id=_message_id)
+            elif user_object.autowipe_sec > 0:
+                sleep(user_object.autowipe_sec)
                 bot.delete_message(chat_id=_chat_id, message_id=_message_id)
             elif user_object.messages_count < settings_object.stickers_count:
                 bot.delete_message(chat_id=_chat_id, message_id=_message_id)
