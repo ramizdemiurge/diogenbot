@@ -139,11 +139,11 @@ def admin_method(bot, update, settings, user_object):
                             user_object.save()
                             if int(text_array[1]) > 0:
                                 update.message.reply_text(
-                                    "Включено автоудаление сообщений " + get_username_or_name_sb(
-                                        _user) + " c задержкой: "
-                                    + str(text_array[1]) + " сек.")
+                                    "Включено автоудаление сообщений " + get_username_or_name_sb(_reply_user)
+                                    + " c задержкой: " + str(text_array[1]) + " сек.")
                             else:
                                 update.message.reply_text("Автоудаление выключено.")
+                            return
                 else:
                     if text == "/warn":
                         user_query = User.select().where(User.chat_id == _chat_id, User.user_id == _reply_user.id)
