@@ -91,10 +91,10 @@ class Bot:
             if spam_cheker(update.message.text):
                 try:
                     bot.delete_message(chat_id=_chat_id, message_id=_message_id)
-                    bot.send_message(_chat_id, "Удалена попытка спама " + get_username_or_name_sb(update.message.from_user))
+                    bot.send_message(_chat_id,
+                                     "Удалена попытка спама " + get_username_or_name_sb(update.message.from_user))
                 except Exception as e:
-                    bot.send_message(_chat_id, "Не могу удалить спам от " + get_username_or_name_sb(update.message.from_user)+
-                                     ": "+str(e))
+                    update.message.reply_text("Не могу удалить спам: " + str(e))
                 return
         else:
 
