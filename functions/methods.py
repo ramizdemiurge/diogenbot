@@ -3,8 +3,8 @@ import datetime
 import pendulum
 
 from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
-from model.lists import banned_words, thank_words
 from model.database_model import UserLogs, User, AdminList, Groups, Settings
+from model.lists import banned_words, thank_words
 
 
 def inbox(update):
@@ -16,12 +16,9 @@ def inbox(update):
         return False
 
 
-def spam_cheker(message):
-    message = message.lower()
-    for x in banned_words:
-        if x in message:
-            return True
-    return False
+def spam_cheker(text):
+    text = text.lower()
+    return any(b_word in text for b_word in banned_words)
 
 
 def thanks_checkers(message):
@@ -71,7 +68,7 @@ def get_user(bot, update):
     else:
         user_object = User.create(user_id=update.message.from_user.id, first_name=_first_name,
                                   last_name=_last_name, chat_id=_chat_id, t_username=_username,
-                                  last_activity=datetime.datetime.now())
+                                  last_activity=datetime.datetime.now(), start_time=datetime.datetime.now())
         user_object = user_query.first()
         return user_object
 
@@ -119,30 +116,45 @@ def changes_detector(user_from_db, update, bot):
             update.message.reply_text(choice_variant_from_file('changes.txt'))
 
 
-def admin_method(bot, update, settings):
+def admin_method(bot, update, settings, user_object):
     _chat_id = update.message.chat.id
     _user = update.message.from_user
+    text = update.message.text
+    text_array = text.split()
 
     try:
         if update.message.text:
             if update.message.reply_to_message is None:
                 pass
             else:
-                text = update.message.text
                 _reply_user = update.message.reply_to_message.from_user
-                if text == "/warn":
-                    user_query = User.select().where(User.chat_id == _chat_id, User.user_id == _reply_user.id)
-                    if user_query.exists():
-                        user_object = user_query.first()
-                        user_object.warns += 1
-                        user_object.save()
-                        bot.send_message(_chat_id, get_username_or_name_sb(_reply_user) + " выполнено предупреждение."
-                                                                                          " (" + str(
-                            user_object.warns) + "/" + "5)")
+                if len(text_array) >= 2:
+                    if text_array[0] == "/wipe":
+                        if int(text_array[1]) > 600:
+                            text_array[1] = 600
+                        user_query = User.select().where(User.chat_id == _chat_id, User.user_id == _reply_user.id)
+                        if user_query.exists():
+                            user_object = user_query.first()
+                            user_object.autowipe_sec = int(text_array[1])
+                            user_object.save()
+                            if int(text_array[1]) > 0:
+                                update.message.reply_text(
+                                    "Включено автоудаление сообщений " + get_username_or_name_sb(
+                                        _user) + " c задержкой: "
+                                    + str(text_array[1]) + " сек.")
+                            else:
+                                update.message.reply_text("Автоудаление выключено.")
+                else:
+                    if text == "/warn":
+                        user_query = User.select().where(User.chat_id == _chat_id, User.user_id == _reply_user.id)
+                        if user_query.exists():
+                            user_object = user_query.first()
+                            user_object.warns += 1
+                            user_object.save()
+                            bot.send_message(_chat_id, get_username_or_name_sb(_reply_user) +
+                                             " выполнено предупреждение. (" + str(user_object.warns) + "/" + "5)")
 
         if update.message.text:
-            text = update.message.text
-            text_array = text.split()
             if len(text_array) >= 2:
                 if text_array[0] == "/setcount":
                     old_value = settings.antibot_count
@@ -154,6 +166,18 @@ def admin_method(bot, update, settings):
                     settings.stickers_count = int(text_array[1])
                     settings.save()
                     update.message.reply_text("Изменено с " + str(old_value) + " на " + text_array[1])
+                elif text_array[0] == "/wipe":
+                    if int(text_array[1]) > 600:
+                        text_array[1] = 600
+                    user_object.autowipe_sec = int(text_array[1])
+                    user_object.save()
+                    if int(text_array[1]) > 0:
+                        update.message.reply_text(
+                            "Включено автоудаление ваших сообщений c задержкой: " + str(text_array[1]) +
+                            " сек.")
+                    else:
+                        update.message.reply_text("Автоудаление выключено.")
+
             else:
                 if text == "/stickers_off":
                     settings.delete_stickers = True
@@ -171,8 +195,9 @@ def admin_method(bot, update, settings):
                     settings.delete_messages = False
                     settings.save()
                     bot.send_message(_chat_id, get_username_or_name(_user) + " отменил тишину...")
+
     except Exception as e:
-        update.message.reply_text("Exception " + str(e))
+        update.message.reply_text("Exception: " + str(e))
 
 
 def super_admin_method(bot, update):
