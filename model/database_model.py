@@ -29,6 +29,8 @@ class User(Model):
     rating_minus = IntegerField(default=1)
     warns = IntegerField(default=0)
     last_activity = DateTimeField()
+    start_time = DateTimeField(null=True)
+    autowipe_sec = IntegerField(default=0, null=False)
 
     class Meta:
         database = db
