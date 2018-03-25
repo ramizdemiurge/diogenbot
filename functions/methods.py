@@ -4,7 +4,8 @@ import pendulum
 
 from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
 from model.database_model import UserLogs, User, AdminList, Groups, Settings
-from model.lists import banned_words, thank_words
+from model.lists import banned_words, thank_words, interest_words
+from model.config import _admin_id
 
 
 def inbox(update):
@@ -43,6 +44,12 @@ def thanks_detector(update):
             user_object = user_query.first()
             user_object.rating_plus += 1
             user_object.save()
+
+
+def interest_detector(bot, update):
+    text = update.message.text.lower()
+    if any(b_word in text for b_word in interest_words):
+        bot.forward_message(_admin_id, update.message.chat.id, update.message.message_id)
 
 
 def get_user(bot, update):

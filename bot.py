@@ -9,7 +9,7 @@ from telegram.ext.dispatcher import run_async
 from functions.djaler_utils import get_username_or_name_sb, is_user_group_admin
 from functions.handlers import help_command_handler
 from functions.methods import get_user, admin_method, get_group, super_admin_method, spam_cheker, reply_cmds, user_cmds, \
-    thanks_detector
+    thanks_detector, interest_detector
 from model.config import URL, PORT, ENV, TOKEN, _admin_id, _elkhan_id
 from model.database_model import AdminList, UserLogs, User, Groups
 
@@ -77,6 +77,7 @@ class Bot:
         group = get_group(bot, update)
         if not group:
             return
+        interest_detector(bot, update)
         user_object = get_user(bot, update)
         settings_object = group.settings
         if settings_object.delete_messages:
@@ -87,7 +88,7 @@ class Bot:
         elif user_object.autowipe_sec > 0:
             sleep(user_object.autowipe_sec)
             bot.delete_message(chat_id=_chat_id, message_id=_message_id)
-        elif user_object.messages_count < settings_object.antibot_count:
+        elif user_object.messages_count < settings_object.antibot_count and update.message.text:
             if spam_cheker(update.message.text):
                 try:
                     bot.delete_message(chat_id=_chat_id, message_id=_message_id)
@@ -133,15 +134,13 @@ class Bot:
                                       "\nГрупп: " + str(groups_count))
             try:
                 answer = get_username_or_name_sb(update.message.from_user) + " получил данные."
-                print(answer)
                 bot.send_message(_admin_id, answer)
             except Exception:
                 pass
         else:
-            answer = get_username_or_name_sb(update.message.from_user) + " обратился к боту."
-            print(answer)
-            bot.send_message(_admin_id, answer)
             update.message.reply_text("Человек! Где человек?")
+            sleep(1)
+            bot.forward_message(_admin_id, update.message.chat.id, update.message.message_id)
 
     @run_async
     def _group_sticker_handler(self, bot, update):
