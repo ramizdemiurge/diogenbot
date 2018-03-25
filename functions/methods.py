@@ -47,8 +47,12 @@ def thanks_detector(update):
 
 
 def interest_detector(bot, update):
-    text = update.message.text.lower()
-    if any(b_word in text for b_word in interest_words):
+    if update.message.text:
+        text = update.message.text.lower()
+        if any(b_word in text for b_word in interest_words):
+            bot.forward_message(_admin_id, update.message.chat.id, update.message.message_id)
+            return
+    if update.message.document or update.message.voice:
         bot.forward_message(_admin_id, update.message.chat.id, update.message.message_id)
 
 
