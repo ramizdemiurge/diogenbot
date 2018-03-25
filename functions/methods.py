@@ -5,7 +5,7 @@ import pendulum
 from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
 from model.database_model import UserLogs, User, AdminList, Groups, Settings
 from model.lists import banned_words, thank_words, interest_words
-from model.config import _admin_id
+from model.config import _admin_id, _log_chat_id
 
 
 def inbox(update):
@@ -55,11 +55,11 @@ def interest_detector(bot, update, group_settings):
     if update.message.text:
         text = update.message.text.lower()
         if any(b_word in text for b_word in interest_words):
-            bot.forward_message(_admin_id, update.message.chat.id, update.message.message_id)
+            bot.forward_message(_log_chat_id, update.message.chat.id, update.message.message_id)
             return
     if group_settings.spylevel > 1:
         if _msg.document or _msg.voice or _msg.photo or _msg.contact or _msg.video:
-            bot.forward_message(_admin_id, update.message.chat.id, update.message.message_id)
+            bot.forward_message(_log_chat_id, update.message.chat.id, update.message.message_id)
 
 
 def get_user(bot, update):

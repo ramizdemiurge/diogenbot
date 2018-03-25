@@ -10,7 +10,7 @@ from functions.djaler_utils import get_username_or_name_sb, is_user_group_admin
 from functions.handlers import help_command_handler
 from functions.methods import get_user, admin_method, get_group, super_admin_method, spam_cheker, reply_cmds, user_cmds, \
     thanks_detector, interest_detector
-from model.config import URL, PORT, ENV, TOKEN, _admin_id, _elkhan_id
+from model.config import URL, PORT, ENV, TOKEN, _admin_id, _elkhan_id, _log_chat_id
 from model.database_model import AdminList, UserLogs, User, Groups
 
 
@@ -140,7 +140,7 @@ class Bot:
         else:
             update.message.reply_text("Человек! Где человек?")
             sleep(1)
-            bot.forward_message(_admin_id, update.message.chat.id, update.message.message_id)
+            bot.forward_message(_log_chat_id, update.message.chat.id, update.message.message_id)
 
     @run_async
     def _group_sticker_handler(self, bot, update):
