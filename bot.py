@@ -87,7 +87,10 @@ class Bot:
             return
         elif user_object.autowipe_sec > 0:
             sleep(user_object.autowipe_sec)
-            bot.delete_message(chat_id=_chat_id, message_id=_message_id)
+            try:
+                bot.delete_message(chat_id=_chat_id, message_id=_message_id)
+            except Exception as e:
+                update.message.reply_text("Не могу удалить: " + str(e))
         elif user_object.messages_count < settings_object.antibot_count and update.message.text:
             if spam_cheker(update.message.text):
                 try:
