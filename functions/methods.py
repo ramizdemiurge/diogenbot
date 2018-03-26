@@ -147,8 +147,8 @@ def admin_method(bot, update, settings, user_object):
                 _reply_user = update.message.reply_to_message.from_user
                 if len(text_array) >= 2:
                     if text_array[0] == "/wipe":
-                        if int(text_array[1]) > 600:
-                            text_array[1] = 600
+                        if int(text_array[1]) > 60:
+                            text_array[1] = 60
                         user_query = User.select().where(User.chat_id == _chat_id, User.user_id == _reply_user.id)
                         if user_query.exists():
                             user_object = user_query.first()
@@ -184,14 +184,13 @@ def admin_method(bot, update, settings, user_object):
                     settings.save()
                     update.message.reply_text("Изменено с " + str(old_value) + " на " + text_array[1])
                 elif text_array[0] == "/wipe":
-                    if int(text_array[1]) > 600:
-                        text_array[1] = 600
+                    if int(text_array[1]) > 60:
+                        text_array[1] = 60
                     user_object.autowipe_sec = int(text_array[1])
                     user_object.save()
                     if int(text_array[1]) > 0:
                         update.message.reply_text(
-                            "Включено автоудаление ваших сообщений c задержкой: " + str(text_array[1]) +
-                            " сек.")
+                            "Включено автоудаление ваших сообщений c задержкой: " + str(text_array[1]) + " сек.")
                     else:
                         update.message.reply_text("Автоудаление выключено.")
 
@@ -369,7 +368,7 @@ def reply_cmds(update, bot):
                     bot.send_message(_chat_id, "Рейтинг " + get_username_or_name_sb(
                         _reply_user) + ": " + str("%.1f" % rating_value))
                 return True
-            elif _text == "/sps":
+            elif _text == "/sps" or _text == "/like":
                 if _reply_user.id == _user.id:
                     return True
                 user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
@@ -384,7 +383,7 @@ def reply_cmds(update, bot):
                     bot.send_message(_chat_id, get_username_or_name(_user) + " → 🙂 → " + get_username_or_name(
                         _reply_user))
                 return True
-            elif _text == "/ban":
+            elif _text == "/ban" or _text == "/dis":
                 if _reply_user.id == _user.id:
                     return True
                 user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
