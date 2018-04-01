@@ -256,8 +256,8 @@ def super_admin_method(bot, update):
                     else:
                         _text_array[0] = _text_array[1] = ""
                         send_text = "".join([str(x + " ") for x in _text_array])
-                        bot.send_message(str(_text_array[1]), send_text)
-                        update.message.reply_text("Чат не найден.")
+                        bot.send_message(str(chat_name), send_text)
+                        # update.message.reply_text("Чат не найден.")
                     return True
             # if len(_text_array) >= 3:
             #     pass
