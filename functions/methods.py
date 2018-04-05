@@ -349,6 +349,25 @@ def super_admin_method(bot, update):
                     else:
                         update.message.reply_text("Этот чат не зарегистрирован.")
                     return True
+                if _text == "/bot":
+
+                    # update.message.reply_text("Комманды бота:\n/setcount <int> - количество написанных " +
+                    #                               "сообщений после которого пользователю позволяется отправлять ссылки\n" +
+                    #                               "/stickercount - количество написанных сообщений после которого пользователю"
+                    #                               " позволяется отправлять стикеры в чат\n" +
+                    #                               "/sticker_on (/sticker_off) - включение/выключение стикеров в группе\n" +
+                    #                               "/text_on (/text_off) - включение/выключение сообщений в группе\n" +
+                    #                               "/warn - предупредить пользователя\n" +
+                    #                               "/log посмотреть историю изменений профильной информации пользователя\n" +
+                    #                               "/stats - ваша статистика\n" +
+                    #                               "(комманды работают в чате группы)")
+                    logs_count = UserLogs.select().count()
+                    users_count = User.select().count()
+                    groups_count = Groups.select().count()
+                    update.message.reply_text("База данных:" +
+                                                "\nЛоги: " + str(logs_count) +
+                                                "\nПользователи: " + str(users_count) +
+                                                "\nГруппы: " + str(groups_count))
         except Exception as e:
             update.message.reply_text("Exception: " + str(e))
             return True
