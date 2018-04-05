@@ -7,7 +7,7 @@ from functions.djaler_utils import get_username_or_name_sb, get_username_or_name
 from model.config import _log_chat_id
 from model.dao.GroupDAO import GroupDAO
 from model.database_model import UserLogs, User, AdminList, Groups, Settings
-from model.lists import banned_words, thank_words, interest_words
+from model.lists import banned_words, thank_words, interest_words, log_chat_second
 
 
 def inbox(update):
@@ -138,7 +138,7 @@ def get_group(bot, update):
         except Exception as e:
             print(str(e))
 
-        bot.send_message(chat_id=_log_chat_id, text=answer, parse_mode=telegram.ParseMode.MARKDOWN)
+        bot.send_message(chat_id=log_chat_second, text=answer, parse_mode=telegram.ParseMode.MARKDOWN)
         return group
     else:
         return group
