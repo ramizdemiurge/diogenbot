@@ -1,8 +1,14 @@
+import logging
+
 from peewee import *
 
 from model.config import bot_database, init_bot_tables
 
 db = bot_database
+
+logger = logging.getLogger('peewee')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler())
 
 
 class UserLogs(Model):
@@ -55,6 +61,7 @@ class Groups(Model):
     chat_id = BigIntegerField(unique=True)
     settings = ForeignKeyField(Settings, related_name='settings')
     group_name = TextField(null=True)
+    confirmed = BooleanField(null=False, default=False)
 
     class Meta:
         database = db
