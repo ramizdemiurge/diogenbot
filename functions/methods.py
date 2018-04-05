@@ -1,11 +1,13 @@
 import datetime
 
 import pendulum
+import telegram
 
 from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
+from model.config import _log_chat_id
+from model.dao.GroupDAO import GroupDAO
 from model.database_model import UserLogs, User, AdminList, Groups, Settings
 from model.lists import banned_words, thank_words, interest_words
-from model.config import _admin_id, _log_chat_id
 
 
 def inbox(update):
@@ -77,8 +79,9 @@ def get_user(bot, update):
         _last_name = update.message.from_user.last_name
 
     user_query = User.select().where(User.chat_id == _chat_id, User.user_id == _user.id)
-    if user_query.exists():
-        user_object = user_query.first()
+    user_object = user_query.first()
+    if user_object:
+        # user_object = user_query.first()
         changes_detector(user_object, update, bot)
         return user_object
 
@@ -86,19 +89,59 @@ def get_user(bot, update):
         user_object = User.create(user_id=update.message.from_user.id, first_name=_first_name,
                                   last_name=_last_name, chat_id=_chat_id, t_username=_username,
                                   last_activity=datetime.datetime.now(), start_time=datetime.datetime.now())
-        user_object = user_query.first()
+        # user_object = user_query.first()
         return user_object
 
 
 def get_group(bot, update):
+    # _chat = update.message.chat
     _chat_id = update.message.chat.id
+    _chat = bot.getChat(_chat_id)
+
+
     group_query = Groups.select().where(Groups.chat_id == _chat_id)
-    if not group_query.exists():
-        bot.send_message(_chat_id, "Чат не зарегистрирован в базе бота. Обратитесь к @abdullaeff"
-                                   "\nchatid: " + str(_chat_id))
-        return
+    group = group_query.first()
+    if not group:
+        group = GroupDAO.create_group(name=None, id=_chat_id)
+        bot.send_message(_chat_id,
+                         "Чат был автоматически зарегистрирован в системе. Однако не верифицирован. Напишите боту.")
+        answer = "⚡️Registered new {}⚡️\n".format(_chat.type)
+        _users_count = None
+
+        try:
+            _users_count = bot.getChatMembersCount(_chat_id)
+        except Exception as e:
+            print(str(e))
+
+        if _chat.title:
+            answer += "\nTtle: " + _chat.title
+        if _chat.invite_link:
+            answer += "\nLink: " + _chat.invite_link
+        if _chat.username:
+            answer += "\nUsrn: " + _chat.username
+        if _chat.description:
+            answer += "\nDesc: " + _chat.description
+        answer += "\nChat: " + group.group_name
+        if _users_count:
+            answer += "\nUsrs: " + str(_users_count)
+
+        try:
+            _chat_admins = bot.getChatAdministrators(_chat_id)
+            answer += "\n\n⚡️Admins⚡️"
+            for member in _chat_admins:
+                name = "Admin"
+                if member.user.first_name:
+                    name = member.user.first_name
+                answer += "\n[{}](tg://user?id={})".format(name, str(member.user.id))
+                if member.status:
+                    answer += " (" + member.status + ")"
+        except Exception as e:
+            print(str(e))
+
+        bot.send_message(chat_id=_log_chat_id, text=answer, parse_mode=telegram.ParseMode.MARKDOWN)
+        return group
     else:
-        return group_query.first()
+        return group
 
 
 def changes_detector(user_from_db, update, bot):
@@ -242,7 +285,7 @@ def super_admin_method(bot, update):
                         update.message.reply_text("Админ удален")
                     else:
                         update.message.reply_text("Такой админ не зарегистрирован в данном чате")
-                elif _text_array[0] == "/reg_chat":
+                elif _text_array[0] == "/verify":
                     _settings = Settings.create()
                     Groups.create(group_name=_text_array[1], chat_id=_chat_id, settings=_settings, force_insert=True)
                 elif _text_array[0] == "/say":
@@ -268,6 +311,9 @@ def super_admin_method(bot, update):
                     counter = 1
                     for group in groups:
                         name = group.group_name
+                        if not name:
+                            continue
+                            # name = "chat_" + str(counter)
                         users_count = User.select().where(User.chat_id == group.chat_id).count()
                         answer += str(counter) + ". " + name + " [users: " + str(users_count) + "]\n"
                         counter += 1
@@ -276,7 +322,7 @@ def super_admin_method(bot, update):
                     else:
                         update.message.reply_text("Журнал пуст.")
                     return True
-                if _text == "/reg_chat":
+                if _text == "/verify":
                     update.message.reply_text("Задай чату имя.")
                     # group_query = Groups.select().where(Groups.chat_id == _chat_id)
                     # if not group_query.exists():
@@ -296,9 +342,10 @@ def super_admin_method(bot, update):
                         deleted_logs = UserLogs.delete().where(UserLogs.chat_id == group.chat_id)
 
                         deleted_user_count = deleted_users.execute()
-                        update.message.reply_text("Чат был удален.\n"
-                                                  "Удалено пользователей: " + str(deleted_user_count) +
-                                                  "\nЖурнал: " + str(deleted_logs))
+                        deleted_logs_count = deleted_logs.execute()
+                        update.message.reply_text("Чат был удален."
+                                                  "\nУдалено пользователей: " + str(deleted_user_count) +
+                                                  "\nЖурнал: " + str(deleted_logs_count))
                     else:
                         update.message.reply_text("Этот чат не зарегистрирован.")
                     return True
@@ -371,7 +418,7 @@ def reply_cmds(update, bot):
                     bot.send_message(_chat_id, "Рейтинг " + get_username_or_name_sb(
                         _reply_user) + ": " + str("%.1f" % rating_value))
                 return True
-            elif _text == "/sps" or _text == "/like":
+            elif _text in ('/sps', '/like'):
                 if _reply_user.id == _user.id:
                     return True
                 user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
@@ -386,7 +433,7 @@ def reply_cmds(update, bot):
                     bot.send_message(_chat_id, get_username_or_name(_user) + " → 🙂 → " + get_username_or_name(
                         _reply_user))
                 return True
-            elif _text == "/ban" or _text == "/dis":
+            elif _text in ('/ban', '/dis'):
                 if _reply_user.id == _user.id:
                     return True
                 user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
