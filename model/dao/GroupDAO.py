@@ -27,4 +27,9 @@ class GroupDAO:
     @staticmethod
     def create_group(name, id):
         settings_obj = Settings.create()
-        Groups.create(group_name=name, chat_id=id, settings=settings_obj, force_insert=True)
+        if name is None:
+            import random
+            import string
+            name = ''.join(
+                [random.choice(string.ascii_letters + string.digits) for n in range(4)]).lower()
+        return Groups.create(group_name=name, chat_id=id, settings=settings_obj, force_insert=True)
