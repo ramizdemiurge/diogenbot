@@ -23,10 +23,10 @@ class UserDAO:
         dt = datetime.datetime.now()
         timestamp = int((time.mktime(dt.timetuple()) + dt.microsecond / 1000000.0) * 1000)
 
-        query = "UPDATE 'user' SET messages_count = messages_count + 1, last_activity = {}  WHERE user_id = {} AND chat_id = {}" \
+        query = "UPDATE \"user\" SET messages_count = messages_count + 1, last_activity = {}  WHERE user_id = {} AND chat_id = {}" \
             .format(timestamp, user_id, chat_id)
         try:
             db.execute_sql(query)
             db.close()
         except Exception as e:
-            bot.send_message(log_chat_second, "Error: " + str(e))
+            bot.send_message(log_chat_second, "Error: " + str(e)+"\nQuery: "+query)
