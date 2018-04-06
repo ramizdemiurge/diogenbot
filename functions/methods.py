@@ -94,9 +94,8 @@ def get_user(bot, update):
 
 
 def get_group(bot, update):
-    # _chat = update.message.chat
+    _chat = update.message.chat
     _chat_id = update.message.chat.id
-    _chat = bot.getChat(_chat_id)
 
 
     group_query = Groups.select().where(Groups.chat_id == _chat_id)
@@ -112,6 +111,11 @@ def get_group(bot, update):
             _users_count = bot.getChatMembersCount(_chat_id)
         except Exception as e:
             print(str(e))
+
+        try:
+            _chat = bot.getChat(_chat_id)
+        except Exception as e:
+            bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Trying to get chat")
 
         if _chat.title:
             answer += "\nTtle: " + _chat.title
