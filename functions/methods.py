@@ -97,7 +97,6 @@ def get_group(bot, update):
     _chat = update.message.chat
     _chat_id = update.message.chat.id
 
-
     group_query = Groups.select().where(Groups.chat_id == _chat_id)
     group = group_query.first()
     if not group:
@@ -143,9 +142,7 @@ def get_group(bot, update):
             print(str(e))
 
         bot.send_message(chat_id=log_chat_second, text=answer, parse_mode=telegram.ParseMode.MARKDOWN)
-        return group
-    else:
-        return group
+    return group
 
 
 def changes_detector(user_from_db, update, bot):
