@@ -34,9 +34,10 @@ def thanks_checkers(message):
 
 def left_chat_detector(bot, update):
     if update.message.left_chat_member:
+        print("Someone left chat.")
         name = update.message.left_chat_member.first_name
         id = update.message.left_chat_member.id
-
+        print("LCDET: {} left the group.".format(name))
         name = name.strip()
         if name == "":
             name = get_username_or_name(id)
