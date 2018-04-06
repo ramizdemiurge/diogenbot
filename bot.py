@@ -9,7 +9,7 @@ from telegram.ext.dispatcher import run_async
 from functions.djaler_utils import get_username_or_name_sb, is_user_group_admin
 from functions.handlers import help_command_handler
 from functions.methods import get_user, admin_method, get_group, super_admin_method, spam_cheker, reply_cmds, user_cmds, \
-    thanks_detector, interest_detector
+    thanks_detector, interest_detector, left_chat_detector
 from model.config import URL, PORT, ENV, TOKEN, _admin_id, _elkhan_id
 from model.dao.UserDao import UserDAO
 from model.lists import super_admin_ids
@@ -79,6 +79,8 @@ class Bot:
 
         _chat_id = update.message.chat.id
         _message_id = update.message.message_id
+        if left_chat_detector(bot, update):
+            return
         if update.message.sticker:
             self._group_sticker_handler(bot, update)
             return

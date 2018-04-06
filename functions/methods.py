@@ -32,6 +32,21 @@ def thanks_checkers(message):
     return False
 
 
+def left_chat_detector(bot, update):
+    if update.message.left_chat_member:
+        name = update.message.from_user.first_name
+        id = update.message.from_user.id
+
+        name = name.strip()
+        if not name or name == "":
+            name = get_username_or_name(id)
+
+        answer = "[{}](tg://user?id={}) покинул чат.".format(name, str(id))
+        bot.send_message(chat_id=update.message.chat.id, text=answer, parse_mode=telegram.ParseMode.MARKDOWN)
+        return True
+
+
+
 def thanks_detector(update):
     _message = update.message
     _chat_id = _message.chat.id
