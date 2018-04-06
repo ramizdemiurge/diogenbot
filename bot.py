@@ -48,6 +48,8 @@ class Bot:
     def _cmd_handler_group(bot, update, groups):
         _user_id = update.message.from_user.id
         _chat_id = update.message.chat.id
+        if update.message.text:
+            print("Комманда: " + update.message.text)
         if _user_id == _admin_id or _user_id == _elkhan_id:
             if super_admin_method(bot, update):
                 return
@@ -74,16 +76,14 @@ class Bot:
 
     # @run_async
     def _group_message_handler(self, bot, update):
+        if update.message.text:
+            print("Сообщение: " + update.message.text)
         _chat_id = update.message.chat.id
         _message_id = update.message.message_id
         if update.message.sticker:
             self._group_sticker_handler(bot, update)
             return
-        elif update.message.text:
-            print("Сообщение: " + update.message.text)
         group = get_group(bot, update)
-        if not group:
-            return
         user_object = get_user(bot, update)
         settings_object = group.settings
         interest_detector(bot, update, settings_object)
