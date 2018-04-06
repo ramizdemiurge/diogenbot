@@ -1,15 +1,10 @@
-import logging
+
 
 from peewee import *
 
 from model.config import bot_database, init_bot_tables
 
 db = bot_database
-
-logger = logging.getLogger('peewee')
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler())
-
 
 class UserLogs(Model):
     # id = IntegerField(primary_key=True)
