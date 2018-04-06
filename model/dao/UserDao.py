@@ -24,5 +24,5 @@ class UserDAO:
 
         query = "UPDATE `user` SET messages_count = messages_count + 1, last_activity = {}  WHERE user_id = {} AND chat_id = {}" \
             .format(timestamp, user_id, chat_id)
-
         db.execute_sql(query)
+        db.close()
