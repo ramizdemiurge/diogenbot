@@ -437,7 +437,7 @@ def reply_cmds(update, bot):
                     bot.send_message(_chat_id, "Рейтинг " + get_username_or_name_sb(
                         _reply_user) + ": " + str("%.1f" % rating_value))
                 return True
-            elif _text in ('/sps', '/like'):
+            elif _text == "/sps" or _text == "/like":
                 if _reply_user.id == _user.id:
                     return True
                 user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
@@ -452,7 +452,7 @@ def reply_cmds(update, bot):
                     bot.send_message(_chat_id, get_username_or_name(_user) + " → 🙂 → " + get_username_or_name(
                         _reply_user))
                 return True
-            elif _text in ('/ban', '/dis'):
+            elif _text in ("/ban", "/dis"):
                 if _reply_user.id == _user.id:
                     return True
                 user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
