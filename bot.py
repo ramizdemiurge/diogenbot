@@ -44,7 +44,7 @@ class Bot:
         self._updater.dispatcher.add_handler(MessageHandler(Filters.all, self._message_handler))
 
     @staticmethod
-    # @run_async
+    @run_async
     def _cmd_handler_group(bot, update, groups):
         _user_id = update.message.from_user.id
         _chat_id = update.message.chat.id
@@ -74,7 +74,6 @@ class Bot:
 
     # @run_async
     def _group_message_handler(self, bot, update):
-        print("Пришло сообщение:")
         _chat_id = update.message.chat.id
         _message_id = update.message.message_id
         if update.message.sticker:
