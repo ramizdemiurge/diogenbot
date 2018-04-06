@@ -79,6 +79,8 @@ class Bot:
         if update.message.sticker:
             self._group_sticker_handler(bot, update)
             return
+        elif update.message.text:
+            print("Сообщение: " + update.message.text)
         group = get_group(bot, update)
         if not group:
             return
