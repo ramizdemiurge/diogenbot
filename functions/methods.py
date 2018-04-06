@@ -34,8 +34,8 @@ def thanks_checkers(message):
 
 def left_chat_detector(bot, update):
     if update.message.left_chat_member:
-        name = update.message.from_user.first_name
-        id = update.message.from_user.id
+        name = update.message.left_chat_member.first_name
+        id = update.message.left_chat_member.id
 
         name = name.strip()
         if not name or name == "":
