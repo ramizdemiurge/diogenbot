@@ -38,7 +38,7 @@ def left_chat_detector(bot, update):
         id = update.message.left_chat_member.id
 
         name = name.strip()
-        if not name or name == "":
+        if name == "":
             name = get_username_or_name(id)
 
         answer = "[{}](tg://user?id={}) покинул чат.".format(name, str(id))
