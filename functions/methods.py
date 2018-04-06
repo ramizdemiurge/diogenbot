@@ -82,7 +82,10 @@ def get_user(bot, update):
     user_object = user_query.first()
     if user_object:
         # user_object = user_query.first()
-        changes_detector(user_object, update, bot)
+        try:
+            changes_detector(user_object, update, bot)
+        except Exception as e:
+            bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Detecting changes")
         return user_object
 
     else:
