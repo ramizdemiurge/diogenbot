@@ -44,7 +44,7 @@ class Bot:
         self._updater.dispatcher.add_handler(MessageHandler(Filters.all, self._message_handler))
 
     @staticmethod
-    @run_async
+    # @run_async
     def _cmd_handler_group(bot, update, groups):
         _user_id = update.message.from_user.id
         _chat_id = update.message.chat.id
@@ -72,7 +72,7 @@ class Bot:
                 if update.message.text == "/start":
                     update.message.reply_text("Человек! Где человек?")
 
-    @run_async
+    # @run_async
     def _group_message_handler(self, bot, update):
         print("Пришло сообщение:")
         _chat_id = update.message.chat.id
@@ -119,7 +119,7 @@ class Bot:
         # user_object.save()
         UserDAO.increment_msg_count(user_object)
 
-    @run_async
+    # @run_async
     def _message_handler(self, bot, update):
 
         _user_id = update.message.from_user.id
@@ -145,7 +145,7 @@ class Bot:
             else:
                 bot.forward_message(super_admin_ids[0], update.message.chat.id, update.message.message_id)
 
-    @run_async
+    # @run_async
     def _group_sticker_handler(self, bot, update):
         group = get_group(bot, update)
         if not group:
