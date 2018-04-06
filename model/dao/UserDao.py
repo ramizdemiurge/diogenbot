@@ -1,6 +1,7 @@
 import datetime
 
 from model.database_model import User, db
+from model.lists import log_chat_second
 
 
 class UserDAO:
@@ -15,7 +16,7 @@ class UserDAO:
             return user_query.first()
 
     @staticmethod
-    def increment_msg_count(user: User):
+    def increment_msg_count(user: User, bot):
         user_id = user.user_id
         chat_id = user.chat_id
         import time
@@ -24,5 +25,8 @@ class UserDAO:
 
         query = "UPDATE `user` SET messages_count = messages_count + 1, last_activity = {}  WHERE user_id = {} AND chat_id = {}" \
             .format(timestamp, user_id, chat_id)
-        db.execute_sql(query)
-        db.close()
+        try:
+            db.execute_sql(query)
+            db.close()
+        except Exception as e:
+            bot.send_message(log_chat_second, "Error: " + str(e))

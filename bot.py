@@ -116,7 +116,7 @@ class Bot:
         # user_object.messages_count += 1
         # user_object.last_activity = datetime.datetime.now()
         # user_object.save()
-        UserDAO.increment_msg_count(user_object)
+        UserDAO.increment_msg_count(user_object, bot)
 
     # @run_async
     def _message_handler(self, bot, update):
