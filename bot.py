@@ -76,8 +76,7 @@ class Bot:
 
     # @run_async
     def _group_message_handler(self, bot, update):
-        if update.message.text:
-            print("Сообщение: " + update.message.text)
+
         _chat_id = update.message.chat.id
         _message_id = update.message.message_id
         if update.message.sticker:
@@ -87,10 +86,15 @@ class Bot:
         user_object = get_user(bot, update)
         settings_object = group.settings
         interest_detector(bot, update, settings_object)
+        if update.message.text:
+            print("Сообщение: " + update.message.text)
         if settings_object.delete_messages:
             if settings_object.delete_messages_seconds > 0:
                 sleep(settings_object.delete_messages_seconds)
-            bot.delete_message(chat_id=_chat_id, message_id=_message_id)
+            try:
+                bot.delete_message(chat_id=_chat_id, message_id=_message_id)
+            except Exception as e:
+                print("Exception: " + str(e))
             return
         elif user_object.autowipe_sec > 0:
             sleep(user_object.autowipe_sec)
