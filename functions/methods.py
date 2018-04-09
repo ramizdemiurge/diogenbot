@@ -1,4 +1,5 @@
 import datetime
+from time import sleep
 
 import pendulum
 import telegram
@@ -406,11 +407,11 @@ def user_cmds(bot, update, user):
                 rating_value = float(user.rating_plus / user.rating_minus)
                 answer = "Сообщений: " + str(user.messages_count) + ", изменений в профиле: " + str(
                     user.changes_count) + ", идентификатор: " + str(_user.id) + ", чат: " + str(
-                    _chat_id) + ", рейтинг: " + \
-                         str("%.1f" % rating_value)
+                    _chat_id) + ", рейтинг: " + str("%.1f" % rating_value)
                 update.message.reply_text(answer)
                 return True
             if "/info" in _text:
+                bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
                 user_query = User.select().where(User.user_id == _user.id, User.chat_id == _chat_id)
                 if user_query.exists():
                     user_object = user_query.first()
@@ -418,10 +419,27 @@ def user_cmds(bot, update, user):
                     update.message.reply_text("Ваш рейтинг: " + str("%.1f" % rating_value))
                 return True
             if "/vsem_ban" in _text:
+                bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
+                sleep(0.5)
                 bot.send_message(chat_id=update.message.chat.id, text="`Все зобанени`", parse_mode=telegram.ParseMode.MARKDOWN)
                 return True
             if "/clicktobecomeautist" in _text:
+                bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
+                sleep(0.5)
                 update.message.reply_text(text="`Ви аутист.`", parse_mode=telegram.ParseMode.MARKDOWN)
+                return True
+            if "/checkdown" in _text:
+                choices = ["даун", "не даун"]
+                import random
+                print(random.choice(choices))
+                bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
+                sleep(0.5)
+                update.message.reply_text(text="Вы {}.".format(random.choice(choices)), parse_mode=telegram.ParseMode.MARKDOWN)
+                return True
+            if "/log" in _text:
+                bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
+                sleep(1)
+                update.message.reply_text(text="Скоро будет ;)", parse_mode=telegram.ParseMode.MARKDOWN)
                 return True
         pass
     except Exception as e:
