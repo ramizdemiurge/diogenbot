@@ -393,10 +393,10 @@ def super_admin_method(bot, update):
             return True
 
 
-def user_cmds(user, update, text):
+def user_cmds(bot, update, user):
     _chat_id = update.message.chat.id
     _user = update.message.from_user
-    _text = text
+    _text = update.message.text
     _text_array = _text.split()
     try:
         if len(_text_array) >= 2:
@@ -416,6 +416,9 @@ def user_cmds(user, update, text):
                     user_object = user_query.first()
                     rating_value = float(user_object.rating_plus / user_object.rating_minus)
                     update.message.reply_text("Ваш рейтинг: " + str("%.1f" % rating_value))
+                return True
+            if "/vsem_ban" in _text:
+                bot.send_message(chat_id=update.message.chat.id, text="`Все были зобанени`", parse_mode=telegram.ParseMode.MARKDOWN)
                 return True
         pass
     except Exception as e:
