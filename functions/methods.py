@@ -420,6 +420,9 @@ def user_cmds(bot, update, user):
             if "/vsem_ban" in _text:
                 bot.send_message(chat_id=update.message.chat.id, text="`Все зобанени`", parse_mode=telegram.ParseMode.MARKDOWN)
                 return True
+            if "/ClickToBecomeAutist" in _text:
+                update.message.reply_text(text="`Ви аутист.`", parse_mode=telegram.ParseMode.MARKDOWN)
+                return True
         pass
     except Exception as e:
         update.message.reply_text("Exception: " + str(e))
