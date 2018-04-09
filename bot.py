@@ -1,4 +1,3 @@
-import datetime
 from time import sleep
 
 import pendulum
@@ -59,7 +58,7 @@ class Bot:
             if group:
                 user_object = get_user(bot, update)
                 if update.message.reply_to_message is None:
-                    if user_cmds(user_object, update, update.message.text):
+                    if user_cmds(bot, update, user_object):
                         return
                 elif reply_cmds(update, bot):
                     return
@@ -115,7 +114,7 @@ class Bot:
                 return
         else:
 
-            user_cmds(user_object, update, update.message.text)
+            # user_cmds(user_object, update, update.message.text)
             if update.message.reply_to_message is None:
                 pass
             else:
