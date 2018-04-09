@@ -418,7 +418,7 @@ def user_cmds(bot, update, user):
                     update.message.reply_text("Ваш рейтинг: " + str("%.1f" % rating_value))
                 return True
             if "/vsem_ban" in _text:
-                bot.send_message(chat_id=update.message.chat.id, text="`Все были зобанени`", parse_mode=telegram.ParseMode.MARKDOWN)
+                bot.send_message(chat_id=update.message.chat.id, text="`Все зобанени`", parse_mode=telegram.ParseMode.MARKDOWN)
                 return True
         pass
     except Exception as e:
