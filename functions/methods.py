@@ -396,7 +396,7 @@ def super_admin_method(bot, update):
 def user_cmds(bot, update, user):
     _chat_id = update.message.chat.id
     _user = update.message.from_user
-    _text = update.message.text
+    _text = update.message.text.lower()
     _text_array = _text.split()
     try:
         if len(_text_array) >= 2:
@@ -420,7 +420,7 @@ def user_cmds(bot, update, user):
             if "/vsem_ban" in _text:
                 bot.send_message(chat_id=update.message.chat.id, text="`Все зобанени`", parse_mode=telegram.ParseMode.MARKDOWN)
                 return True
-            if "/ClickToBecomeAutist" in _text:
+            if "/clicktobecomeautist" in _text:
                 update.message.reply_text(text="`Ви аутист.`", parse_mode=telegram.ParseMode.MARKDOWN)
                 return True
         pass
