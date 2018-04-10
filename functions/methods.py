@@ -483,32 +483,28 @@ def reply_cmds(update, bot):
                         _reply_user) + ": " + str("%.1f" % rating_value))
                 return True
             elif _text in ("/sps", "/like"):
-                bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
-                if check_rate_flood(_user.id, _reply_user.id):
-                    return True
-                user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
-                if user_query.exists():
+                if not check_rate_flood(_user.id, _reply_user.id):
+                    user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                     user_object = user_query.first()
-                    user_object.rating_plus += 1
-                    user_object.save()
-                    bot.send_message(_chat_id, get_username_or_name(_user) + " → 🙂 → " + get_username_or_name(
-                        _reply_user))
+                    if user_object:
+                        user_object.rating_plus += 1
+                        user_object.save()
+                        bot.send_message(_chat_id, get_username_or_name(_user) + " → 🙂 → " + get_username_or_name(
+                            _reply_user))
                 try:
                     bot.delete_message(chat_id=_chat_id, message_id=_message.message_id)
                 except Exception as e:
                     print("Permission: " + str(e))
                 return True
             elif _text in ("/ban", "/dis"):
-                bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
-                if check_rate_flood(_user.id, _reply_user.id):
-                    return True
-                user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
-                if user_query.exists():
+                if not check_rate_flood(_user.id, _reply_user.id):
+                    user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                     user_object = user_query.first()
-                    user_object.rating_minus += 1
-                    user_object.save()
-                    bot.send_message(_chat_id, get_username_or_name(_user) + " → 😡 → " + get_username_or_name(
-                        _reply_user))
+                    if user_object:
+                        user_object.rating_minus += 1
+                        user_object.save()
+                        bot.send_message(_chat_id, get_username_or_name(_user) + " → 😡 → " + get_username_or_name(
+                            _reply_user))
                 try:
                     bot.delete_message(chat_id=_chat_id, message_id=_message.message_id)
                 except Exception as e:
