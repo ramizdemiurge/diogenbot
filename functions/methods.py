@@ -423,19 +423,19 @@ def user_cmds(bot, update, user):
                 sleep(0.5)
                 bot.send_message(chat_id=update.message.chat.id, text="`Все зобанени`", parse_mode=telegram.ParseMode.MARKDOWN)
                 return True
-            if "/clicktobecomeautist" in _text:
-                bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
-                sleep(0.5)
-                update.message.reply_text(text="`Ви аутист.`", parse_mode=telegram.ParseMode.MARKDOWN)
-                return True
-            if "/checkdown" in _text:
-                choices = ["даун", "не даун"]
-                import random
-                print(random.choice(choices))
-                bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
-                sleep(0.5)
-                update.message.reply_text(text="Вы {}.".format(random.choice(choices)), parse_mode=telegram.ParseMode.MARKDOWN)
-                return True
+            # if "/clicktobecomeautist" in _text:
+            #     bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
+            #     sleep(0.5)
+            #     update.message.reply_text(text="`Ви аутист.`", parse_mode=telegram.ParseMode.MARKDOWN)
+            #     return True
+            # if "/checkdown" in _text:
+            #     choices = ["даун", "не даун"]
+            #     import random
+            #     print(random.choice(choices))
+            #     bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
+            #     sleep(0.5)
+            #     update.message.reply_text(text="Вы {}.".format(random.choice(choices)), parse_mode=telegram.ParseMode.MARKDOWN)
+            #     return True
             if "/log" in _text:
                 bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
                 sleep(1)
