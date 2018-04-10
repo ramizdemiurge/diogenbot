@@ -5,6 +5,7 @@ import pendulum
 import telegram
 
 from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
+from functions.raiting import check_rate_flood
 from model.config import _log_chat_id
 from model.dao.GroupDAO import GroupDAO
 from model.database_model import UserLogs, User, AdminList, Groups, Settings
@@ -481,35 +482,35 @@ def reply_cmds(update, bot):
                     bot.send_message(_chat_id, "Рейтинг " + get_username_or_name_sb(
                         _reply_user) + ": " + str("%.1f" % rating_value))
                 return True
-            elif _text == "/sps" or _text == "/like":
-                if _reply_user.id == _user.id:
+            elif _text in ("/sps", "/like"):
+                if check_rate_flood(_user.id, _reply_user.id):
                     return True
                 user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                 if user_query.exists():
                     user_object = user_query.first()
                     user_object.rating_plus += 1
                     user_object.save()
-                    try:
-                        bot.delete_message(chat_id=_chat_id, message_id=_message.message_id)
-                    except Exception as e:
-                        print("Permission: " + str(e))
                     bot.send_message(_chat_id, get_username_or_name(_user) + " → 🙂 → " + get_username_or_name(
                         _reply_user))
+                try:
+                    bot.delete_message(chat_id=_chat_id, message_id=_message.message_id)
+                except Exception as e:
+                    print("Permission: " + str(e))
                 return True
             elif _text in ("/ban", "/dis"):
-                if _reply_user.id == _user.id:
+                if check_rate_flood(_user.id, _reply_user.id):
                     return True
                 user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                 if user_query.exists():
                     user_object = user_query.first()
                     user_object.rating_minus += 1
                     user_object.save()
-                    try:
-                        bot.delete_message(chat_id=_chat_id, message_id=_message.message_id)
-                    except Exception as e:
-                        print("Permission: " + str(e))
                     bot.send_message(_chat_id, get_username_or_name(_user) + " → 😡 → " + get_username_or_name(
                         _reply_user))
+                try:
+                    bot.delete_message(chat_id=_chat_id, message_id=_message.message_id)
+                except Exception as e:
+                    print("Permission: " + str(e))
                 return True
 
     except Exception as e:
