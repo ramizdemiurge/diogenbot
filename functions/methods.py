@@ -483,6 +483,7 @@ def reply_cmds(update, bot):
                         _reply_user) + ": " + str("%.1f" % rating_value))
                 return True
             elif _text in ("/sps", "/like"):
+                bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
                 if check_rate_flood(_user.id, _reply_user.id):
                     return True
                 user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
@@ -498,6 +499,7 @@ def reply_cmds(update, bot):
                     print("Permission: " + str(e))
                 return True
             elif _text in ("/ban", "/dis"):
+                bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
                 if check_rate_flood(_user.id, _reply_user.id):
                     return True
                 user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
