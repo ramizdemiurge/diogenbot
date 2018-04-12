@@ -14,15 +14,17 @@ class GroupDAO:
     @supycache.supycache(cache_key='group_id_{0}', max_age=10 * 60)
     def get_group_by_id(id):
         group_query = Groups.select().where(Groups.chat_id == id).limit(1)
-        if group_query.exists():
-            return group_query.first()
+        group = group_query.first()
+        if group:
+            return group
 
     @staticmethod
     @supycache.supycache(cache_key='group_name_{0}', max_age=10 * 60)
     def get_group_by_name(name):
         group_query = Groups.select().where(Groups.group_name == name).limit(1)
-        if group_query.exists():
-            return group_query.first()
+        group = group_query.first()
+        if group:
+            return group
 
     @staticmethod
     def create_group(name, id):
