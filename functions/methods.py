@@ -367,7 +367,7 @@ def super_admin_method(bot, update):
             # if len(_text_array) >= 3:
             #     pass
             else:
-                if _text == "/groups":
+                if _text == "/chats":
                     groups = Groups.select()
                     answer = ""
                     counter = 1
