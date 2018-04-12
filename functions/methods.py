@@ -118,8 +118,9 @@ def get_group(bot, update):
     _chat = update.message.chat
     _chat_id = update.message.chat.id
 
-    group_query = Groups.select().where(Groups.chat_id == _chat_id)
-    group = group_query.first()
+    # group_query = Groups.select().where(Groups.chat_id == _chat_id)
+    # group = group_query.first()
+    group = GroupDAO.get_group_by_id(_chat_id)
     if not group:
         group = GroupDAO.create_group(name=None, id=_chat_id)
         bot.send_message(_chat_id,

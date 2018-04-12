@@ -19,7 +19,7 @@ class GroupDAO:
             return group
 
     @staticmethod
-    # @supycache.supycache(cache_key='group_name_{0}', max_age=10 * 60)
+    @supycache.supycache(cache_key='group_name_{0}', max_age=10 * 60)
     def get_group_by_name(name):
         group_query = Groups.select().where(Groups.group_name == name).limit(1)
         group = group_query.first()
