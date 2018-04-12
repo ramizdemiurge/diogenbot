@@ -289,7 +289,15 @@ def super_admin_method(bot, update):
         _text_array = _text.split(" ")
 
         try:
-            if len(_text_array) >= 2:
+            if len(_text_array) >= 3:
+                if _text_array[0] == "/group":
+                    _group = GroupDAO.get_group_by_name(_text_array[1])
+                    answer = "Group name `{}` changed to `{}`.".format(_group.group_name, _text_array[2])
+                    _group.group_name = _text_array[2]
+                    _group.save()
+                    update.message.reply_text(answer, parse_mode=telegram.ParseMode.MARKDOWN)
+                    return True
+            elif len(_text_array) == 2:
                 if _text_array[0] == "/add_admin":
                     admin_query = AdminList.select().where(AdminList.user_id == int(_text_array[1]),
                                                            AdminList.group_id == _chat_id)
@@ -308,8 +316,40 @@ def super_admin_method(bot, update):
                     else:
                         update.message.reply_text("Такой админ не зарегистрирован в данном чате")
                 elif _text_array[0] == "/verify":
-                    _settings = Settings.create()
-                    Groups.create(group_name=_text_array[1], chat_id=_chat_id, settings=_settings, force_insert=True)
+                    # _settings = Settings.create()
+                    # Groups.create(group_name=_text_array[1], chat_id=_chat_id, settings=_settings, force_insert=True)
+                    pass
+                elif _text_array[0] == "/group":
+                    bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
+                    _group = GroupDAO.get_group_by_name(_text_array[1])
+                    try:
+                        _users_count = bot.getChatMembersCount(_group.chat_id)
+                        _chat = bot.getChat(_group.chat_id)
+                        _chat_admins = bot.getChatAdministrators(_group.chat_id)
+                        answer = "⚡Info about {}⚡️\n".format(_chat.type)
+                        if _chat.title:
+                            answer += "\nTitle: {}".format(_chat.title)
+                        if _chat.invite_link:
+                            answer += "\nLink: {}".format(_chat.invite_link)
+                        if _chat.username:
+                            answer += "\nUsername: {}".format(_chat.username)
+                        if _chat.description:
+                            answer += "\nDesc: `{}`".format(_chat.description)
+                        if _users_count:
+                            answer += "\nUsers: {}".format(str(_users_count))
+
+                        answer += "\n\n⚡️Admins⚡️"
+                        for member in _chat_admins:
+                            name = "Admin"
+                            if member.user.first_name:
+                                name = member.user.first_name
+                            answer += "\n[{}](tg://user?id={})".format(name, str(member.user.id))
+                            if member.status:
+                                answer += " `(" + member.status + ")`"
+                        update.message.reply_text(answer, parse_mode=telegram.ParseMode.MARKDOWN)
+                    except Exception as e:
+                        bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Trying to get chat")
+                    return True
                 elif _text_array[0] == "/say":
                     chat_name = _text_array[1]
                     group_query = Groups.select().where(Groups.group_name == chat_name).limit(1)
@@ -327,7 +367,7 @@ def super_admin_method(bot, update):
             # if len(_text_array) >= 3:
             #     pass
             else:
-                if _text == "/chats":
+                if _text == "/groups":
                     groups = Groups.select()
                     answer = ""
                     counter = 1
