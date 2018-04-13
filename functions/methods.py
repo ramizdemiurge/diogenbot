@@ -523,6 +523,7 @@ def reply_cmds(update, bot):
                         _reply_user) + ": " + str("%.1f" % rating_value))
                 return True
             elif _text in ("/sps", "/like"):
+                print("{} liked {}".format(_user.first_name, _reply_user.first_name))
                 if not check_rate_flood_hard_mode(_user.id, _reply_user.id):
                     user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                     user_object = user_query.first()
@@ -537,6 +538,7 @@ def reply_cmds(update, bot):
                     print("Permission: " + str(e))
                 return True
             elif _text in ("/ban", "/dis"):
+                print("{} disliked {}".format(_user.first_name, _reply_user.first_name))
                 if not check_rate_flood_hard_mode(_user.id, _reply_user.id):
                     user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                     user_object = user_query.first()
