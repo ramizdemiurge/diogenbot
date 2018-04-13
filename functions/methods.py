@@ -5,10 +5,10 @@ import pendulum
 import telegram
 
 from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
-from functions.raiting import check_rate_flood
+from functions.raiting import check_rate_flood_hard_mode
 from model.config import _log_chat_id
 from model.dao.GroupDAO import GroupDAO
-from model.database_model import UserLogs, User, AdminList, Groups, Settings
+from model.database_model import UserLogs, User, AdminList, Groups
 from model.lists import banned_words, thank_words, interest_words, log_chat_second
 
 
@@ -47,7 +47,6 @@ def left_chat_detector(bot, update):
         answer = "[{}](tg://user?id={}) покинул чат.".format(name, str(id))
         bot.send_message(chat_id=update.message.chat.id, text=answer, parse_mode=telegram.ParseMode.MARKDOWN)
         return True
-
 
 
 def thanks_detector(update):
@@ -413,7 +412,6 @@ def super_admin_method(bot, update):
                         update.message.reply_text("Этот чат не зарегистрирован.")
                     return True
                 if _text == "/bot":
-
                     # update.message.reply_text("Комманды бота:\n/setcount <int> - количество написанных " +
                     #                               "сообщений после которого пользователю позволяется отправлять ссылки\n" +
                     #                               "/stickercount - количество написанных сообщений после которого пользователю"
@@ -428,9 +426,9 @@ def super_admin_method(bot, update):
                     users_count = User.select().count()
                     groups_count = Groups.select().count()
                     update.message.reply_text("База данных:" +
-                                                "\nЛоги: " + str(logs_count) +
-                                                "\nПользователи: " + str(users_count) +
-                                                "\nГруппы: " + str(groups_count))
+                                              "\nЛоги: " + str(logs_count) +
+                                              "\nПользователи: " + str(users_count) +
+                                              "\nГруппы: " + str(groups_count))
         except Exception as e:
             update.message.reply_text("Exception: " + str(e))
             return True
@@ -463,7 +461,8 @@ def user_cmds(bot, update, user):
             if "/vsem_ban" in _text:
                 bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
                 sleep(0.5)
-                bot.send_message(chat_id=update.message.chat.id, text="`Все зобанени`", parse_mode=telegram.ParseMode.MARKDOWN)
+                bot.send_message(chat_id=update.message.chat.id, text="`Все зобанени`",
+                                 parse_mode=telegram.ParseMode.MARKDOWN)
                 return True
             # if "/clicktobecomeautist" in _text:
             #     bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
@@ -524,7 +523,7 @@ def reply_cmds(update, bot):
                         _reply_user) + ": " + str("%.1f" % rating_value))
                 return True
             elif _text in ("/sps", "/like"):
-                if not check_rate_flood(_user.id, _reply_user.id):
+                if not check_rate_flood_hard_mode(_user.id, _reply_user.id):
                     user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                     user_object = user_query.first()
                     if user_object:
@@ -538,7 +537,7 @@ def reply_cmds(update, bot):
                     print("Permission: " + str(e))
                 return True
             elif _text in ("/ban", "/dis"):
-                if not check_rate_flood(_user.id, _reply_user.id):
+                if not check_rate_flood_hard_mode(_user.id, _reply_user.id):
                     user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                     user_object = user_query.first()
                     if user_object:
