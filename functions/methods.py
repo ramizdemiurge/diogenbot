@@ -5,7 +5,7 @@ import pendulum
 import telegram
 
 from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
-from functions.raiting import check_rate_flood_hard_mode
+from functions.raiting import check_rate_flood
 from model.config import _log_chat_id
 from model.dao.GroupDAO import GroupDAO
 from model.database_model import UserLogs, User, AdminList, Groups
@@ -524,7 +524,7 @@ def reply_cmds(update, bot):
                 return True
             elif _text in ("/sps", "/like"):
                 print("{} liked {}".format(_user.first_name, _reply_user.first_name))
-                if not check_rate_flood_hard_mode(_user.id, _reply_user.id):
+                if not check_rate_flood(_user.id, _reply_user.id):
                     user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                     user_object = user_query.first()
                     if user_object:
@@ -539,7 +539,7 @@ def reply_cmds(update, bot):
                 return True
             elif _text in ("/ban", "/dis"):
                 print("{} disliked {}".format(_user.first_name, _reply_user.first_name))
-                if not check_rate_flood_hard_mode(_user.id, _reply_user.id):
+                if not check_rate_flood(_user.id, _reply_user.id):
                     user_query = User.select().where(User.user_id == _reply_user.id, User.chat_id == _chat_id).limit(1)
                     user_object = user_query.first()
                     if user_object:
