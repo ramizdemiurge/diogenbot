@@ -297,7 +297,7 @@ def super_admin_method(bot, update):
                     _group.save()
                     update.message.reply_text(answer, parse_mode=telegram.ParseMode.MARKDOWN)
                     return True
-            elif len(_text_array) == 2:
+            if len(_text_array) >= 2:
                 if _text_array[0] == "/add_admin":
                     admin_query = AdminList.select().where(AdminList.user_id == int(_text_array[1]),
                                                            AdminList.group_id == _chat_id)
