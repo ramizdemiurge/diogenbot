@@ -1,4 +1,5 @@
 import datetime
+import traceback
 from time import sleep
 
 import pendulum
@@ -102,7 +103,9 @@ def get_user(bot, update):
         try:
             changes_detector(user_object, update, bot)
         except Exception as e:
-            bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Detecting changes")
+            meh = str(traceback._cause_message) + ": " + str(traceback._context_message)
+            bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Detecting changes\n\n"+meh)
+            traceback.print_exc()
         return user_object
 
     else:
