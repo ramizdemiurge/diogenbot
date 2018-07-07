@@ -104,7 +104,7 @@ def get_user(bot, update):
             changes_detector(user_object, update, bot)
         except Exception as e:
             meh = str(traceback._cause_message) + ": " + str(traceback._context_message)
-            bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Detecting changes\n\n"+meh)
+            bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Detecting changes\n\n" + meh)
             traceback.print_exc()
         return user_object
 
@@ -190,9 +190,6 @@ def changes_detector(user_from_db, update, bot):
         log_string += "delete uname: " + _user.username + ","
         user_from_db.t_username = None
 
-
-
-
     if _user.first_name:
         if user_from_db.first_name:
             if user_from_db.first_name != _user.first_name:
@@ -207,7 +204,6 @@ def changes_detector(user_from_db, update, bot):
         status = True
         log_string += " delete fname: " + _user.first_name + ","
         user_from_db.first_name = None
-
 
     if _user.last_name:
         if user_from_db.last_name:
@@ -477,9 +473,7 @@ def user_cmds(bot, update, user):
     _text_array = _text.split()
     try:
         if len(_text_array) >= 2:
-            if "кто такой диоген" in _text:
-                bot.forward_message(_chat_id, 76114490, 1575)
-                return True
+            pass
         else:
             if _text == "/stats":
                 rating_value = float(user.rating_plus / user.rating_minus)
@@ -497,10 +491,18 @@ def user_cmds(bot, update, user):
                     update.message.reply_text("Ваш рейтинг: " + str("%.1f" % rating_value))
                 return True
             if "/vsem_ban" in _text:
-                bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
+                rating_value = float(user.rating_plus / user.rating_minus)
+                if rating_value >= 1:
+                    bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
+                    sleep(0.5)
+                    bot.send_message(chat_id=update.message.chat.id, text="`Все зобанени`",
+                                     parse_mode=telegram.ParseMode.MARKDOWN)
+                return True
+            if "/diogen" in _text:
                 sleep(0.5)
-                bot.send_message(chat_id=update.message.chat.id, text="`Все зобанени`",
-                                 parse_mode=telegram.ParseMode.MARKDOWN)
+                rating_value = float(user.rating_plus / user.rating_minus)
+                if rating_value >= 1:
+                    bot.forward_message(_chat_id, 76114490, 1575)
                 return True
             # if "/clicktobecomeautist" in _text:
             #     bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
