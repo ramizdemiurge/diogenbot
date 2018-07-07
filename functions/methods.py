@@ -500,6 +500,9 @@ def user_cmds(bot, update, user):
                 bot.send_message(chat_id=update.message.chat.id, text="`Все зобанени`",
                                  parse_mode=telegram.ParseMode.MARKDOWN)
                 return True
+            if "кто такой диоген" in _text:
+                bot.forward_message(_chat_id, 76114490, 1575)
+                return True
             # if "/clicktobecomeautist" in _text:
             #     bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
             #     sleep(0.5)
