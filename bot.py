@@ -141,6 +141,8 @@ class Bot:
                 bot.forward_message(super_admin_ids[0], update.message.chat.id, update.message.message_id)
         else:
             if is_admin:
+                print(
+                    "MEH. 1(update.message.chat.id):" + update.message.chat.id + ", 2(update.message.message_id):" + update.message.message_id)
                 try:
                     if update.message.text:
                         bot.send_message(update.message.reply_to_message.forward_from.id, update.message.text)
