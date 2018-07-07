@@ -477,7 +477,9 @@ def user_cmds(bot, update, user):
     _text_array = _text.split()
     try:
         if len(_text_array) >= 2:
-            pass
+            if "кто такой диоген" in _text:
+                bot.forward_message(_chat_id, 76114490, 1575)
+                return True
         else:
             if _text == "/stats":
                 rating_value = float(user.rating_plus / user.rating_minus)
@@ -499,9 +501,6 @@ def user_cmds(bot, update, user):
                 sleep(0.5)
                 bot.send_message(chat_id=update.message.chat.id, text="`Все зобанени`",
                                  parse_mode=telegram.ParseMode.MARKDOWN)
-                return True
-            if "кто такой диоген" in _text:
-                bot.forward_message(_chat_id, 76114490, 1575)
                 return True
             # if "/clicktobecomeautist" in _text:
             #     bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
