@@ -138,7 +138,7 @@ def get_group(bot, update):
         try:
             _chat = bot.getChat(_chat_id)
         except Exception as e:
-            bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Trying to get chat")
+            bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Trying to get chat (get_group)")
 
         if _chat.title:
             answer += "\nTtle: " + _chat.title
@@ -384,7 +384,7 @@ def super_admin_method(bot, update):
                                 answer += " `(" + member.status + ")`"
                         update.message.reply_text(answer, parse_mode=telegram.ParseMode.MARKDOWN)
                     except Exception as e:
-                        bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Trying to get chat")
+                        bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Trying to get chat (/group)")
                     return True
                 elif _text_array[0] == "/say":
                     chat_name = _text_array[1]
