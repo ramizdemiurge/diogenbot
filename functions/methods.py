@@ -176,19 +176,38 @@ def changes_detector(user_from_db, update, bot):
     log_string = ""
 
     if _user.username:
-        if user_from_db.t_username != _user.username:
+        if user_from_db.t_username:
+            if user_from_db.t_username != _user.username:
+                status = True
+                log_string += "uname: " + user_from_db.t_username + " → " + _user.username + ","
+                user_from_db.t_username = _user.username
+        else:
             status = True
-            log_string += "uname: " + user_from_db.t_username + " → " + _user.username + ","
+            log_string += "add uname: " + _user.username + ","
             user_from_db.t_username = _user.username
+
+
+
     if _user.first_name:
-        if user_from_db.first_name != _user.first_name:
+        if user_from_db.first_name:
+            if user_from_db.first_name != _user.first_name:
+                status = True
+                log_string += " fname: " + user_from_db.first_name + " → " + _user.first_name + ","
+                user_from_db.first_name = _user.first_name
+        else:
             status = True
-            log_string += " fname: " + user_from_db.first_name + " → " + _user.first_name + ","
+            log_string += " add fname: " + _user.first_name + ","
             user_from_db.first_name = _user.first_name
+
     if _user.last_name:
-        if user_from_db.last_name != _user.last_name:
+        if user_from_db.last_name:
+            if user_from_db.last_name != _user.last_name:
+                status = True
+                log_string += " lname: " + user_from_db.last_name + " → " + _user.last_name + ","
+                user_from_db.last_name = _user.last_name
+        else:
             status = True
-            log_string += " lname: " + user_from_db.last_name + " → " + _user.last_name + ","
+            log_string += " add lname: " + _user.last_name + ","
             user_from_db.last_name = _user.last_name
 
     if status:
