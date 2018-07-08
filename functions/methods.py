@@ -8,6 +8,7 @@ import telegram
 from functions.djaler_utils import get_username_or_name_sb, get_username_or_name, choice_variant_from_file
 from functions.raiting import check_rate_flood
 from model.config import _log_chat_id
+from model.dao.UserDao import UserDAO
 from model.dao.GroupDAO import GroupDAO
 from model.database_model import UserLogs, User, AdminList, Groups
 from model.lists import banned_words, thank_words, interest_words, log_chat_second
@@ -82,19 +83,41 @@ def interest_detector(bot, update, group_settings):
             bot.forward_message(_log_chat_id, update.message.chat.id, update.message.message_id)
 
 
-def get_user(bot, update):
+def new_users(users, _chat_id):
+    for user in users:
+        if not UserDAO.get_by_uid_and_chid(user.id, _chat_id):
+            print("Adding new user to db: {}".format(user.first_name))
+
+            _username = None
+            _first_name = None
+            _last_name = None
+
+            if user.username:
+                _username = user.username
+            if user.first_name:
+                _first_name = user.first_name
+            if user.last_name:
+                _last_name = user.last_name
+            User.create(user_id=user.id, first_name=_first_name,
+                                      last_name=_last_name, chat_id=_chat_id, t_username=_username,
+                                      start_time=datetime.datetime.now(), last_activity=datetime.datetime.now())
+            print("Done.")
+        else:
+            print("User {} is already in DB.".format(user.first_name))
+
+def get_user(bot, update, new_join=False):
     _chat_id = update.message.chat.id
     _user = update.message.from_user
     _username = None
     _first_name = None
     _last_name = None
 
-    if update.message.from_user.username:
-        _username = update.message.from_user.username
-    if update.message.from_user.first_name:
-        _first_name = update.message.from_user.first_name
-    if update.message.from_user.last_name:
-        _last_name = update.message.from_user.last_name
+    if _user.username:
+        _username = _user.username
+    if _user.first_name:
+        _first_name = _user.first_name
+    if _user.last_name:
+        _last_name = _user.last_name
 
     user_query = User.select().where(User.chat_id == _chat_id, User.user_id == _user.id)
     user_object = user_query.first()
@@ -103,16 +126,20 @@ def get_user(bot, update):
         try:
             changes_detector(user_object, update, bot)
         except Exception as e:
-            meh = str(traceback._cause_message) + ": " + str(traceback._context_message)
-            bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Detecting changes\n\n" + meh)
+            bot.send_message(log_chat_second, "Error: " + str(e) + "\nWhile: Detecting changes\n")
             traceback.print_exc()
         return user_object
 
     else:
+        # start_time=datetime.datetime.now()
+        if new_join:
+            _start_time = datetime.datetime.now()
+        else:
+            _start_time = None
+        # user_object = user_query.first()
         user_object = User.create(user_id=update.message.from_user.id, first_name=_first_name,
                                   last_name=_last_name, chat_id=_chat_id, t_username=_username,
-                                  last_activity=datetime.datetime.now(), start_time=datetime.datetime.now())
-        # user_object = user_query.first()
+                                  start_time=_start_time, last_activity=datetime.datetime.now())
         return user_object
 
 
@@ -492,7 +519,7 @@ def user_cmds(bot, update, user):
                 return True
             if "/vsem_ban" in _text:
                 rating_value = float(user.rating_plus / user.rating_minus)
-                if rating_value >= 1:
+                if rating_value >= 2:
                     bot.send_chat_action(chat_id=_chat_id, action=telegram.ChatAction.TYPING)
                     sleep(0.5)
                     bot.send_message(chat_id=update.message.chat.id, text="`Все зобанени`",
