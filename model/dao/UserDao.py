@@ -11,11 +11,10 @@ class UserDAO:
 
     @staticmethod
     def get_by_uid_and_chid(uid, chid):
-        user_query = User.select().where(User.chat_id == uid, User.user_id == chid).limit(1)
-        if user_query.exists():
-            return user_query.first()
-        else:
-            return None
+        user_query = User.select().where(User.chat_id == chid, User.user_id == uid).limit(1)
+        user_object = user_query.first()
+        if user_object:
+            return user_object
 
     @staticmethod
     def increment_msg_count(user: User, bot):
