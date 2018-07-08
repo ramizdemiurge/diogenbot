@@ -95,7 +95,9 @@ def interest_detector(bot, update, group):
 
 def new_users(users, _chat_id):
     for user in users:
+        print("User: {}".format(get_username_or_name_sb(user)))
         if user.is_bot:
+            print("User {} is bot".format(get_username_or_name_sb(user)))
             continue
         user_object = UserDAO.get_by_uid_and_chid(user.id, _chat_id)
         if user_object:

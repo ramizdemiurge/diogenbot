@@ -80,7 +80,9 @@ class Bot:
         _message_id = update.message.message_id
         if left_chat_detector(bot, update):
             return
+
         if update.message.new_chat_members:
+            print("New chat members method.")
             new_users(update.message.new_chat_members, _chat_id)
             return
 
