@@ -70,6 +70,12 @@ def thanks_detector(update):
 def interest_detector(bot, update, group_settings):
     _msg = update.message
 
+    from functions.forwarder import get_forward_group
+    if get_forward_group():
+        from functions.forwarder import ch_id
+        bot.forward_message(ch_id, update.message.chat.id, update.message.message_id)
+        return
+
     if group_settings.spylevel < 1:
         return
 
@@ -378,6 +384,13 @@ def super_admin_method(bot, update):
                         update.message.reply_text("Админ удален")
                     else:
                         update.message.reply_text("Такой админ не зарегистрирован в данном чате")
+                elif _text_array[0] == "/forw":
+                    from functions.forwarder import set_group
+                    if _text_array[1] == "0":
+                        set_group(None)
+                    else:
+                        set_group(_text_array[1])
+                    return True
                 elif _text_array[0] == "/verify":
                     # _settings = Settings.create()
                     # Groups.create(group_name=_text_array[1], chat_id=_chat_id, settings=_settings, force_insert=True)
