@@ -8,7 +8,7 @@ from telegram.ext.dispatcher import run_async
 from functions.djaler_utils import get_username_or_name_sb, is_user_group_admin
 from functions.handlers import help_command_handler
 from functions.methods import get_user, admin_method, get_group, super_admin_method, spam_cheker, reply_cmds, user_cmds, \
-    thanks_detector, interest_detector, left_chat_detector
+    thanks_detector, interest_detector, left_chat_detector, new_users
 from model.config import URL, PORT, ENV, TOKEN, _admin_id, _elkhan_id
 from model.dao.UserDao import UserDAO
 from model.lists import super_admin_ids
@@ -80,6 +80,10 @@ class Bot:
         _message_id = update.message.message_id
         if left_chat_detector(bot, update):
             return
+        if update.message.new_chat_members:
+            new_users(update.message.new_chat_members, _chat_id)
+            return
+
         if update.message.sticker:
             self._group_sticker_handler(bot, update)
             return
@@ -104,15 +108,17 @@ class Bot:
                 bot.delete_message(chat_id=_chat_id, message_id=_message_id)
             except Exception as e:
                 update.message.reply_text("Не могу удалить: " + str(e))
+            return
         elif user_object.messages_count < settings_object.antibot_count and update.message.text:
-            if spam_cheker(update.message.text):
-                try:
-                    bot.delete_message(chat_id=_chat_id, message_id=_message_id)
-                    bot.send_message(_chat_id,
-                                     "Удалена попытка спама " + get_username_or_name_sb(update.message.from_user))
-                except Exception as e:
-                    update.message.reply_text("Не могу удалить спам: " + str(e))
-                return
+            if user_object.start_time:
+                if spam_cheker(update.message.text):
+                    try:
+                        bot.delete_message(chat_id=_chat_id, message_id=_message_id)
+                        bot.send_message(_chat_id,
+                                         "Удалена попытка спама " + get_username_or_name_sb(update.message.from_user))
+                    except Exception as e:
+                        update.message.reply_text("Не могу удалить спам: " + str(e))
+                    return
         else:
 
             # user_cmds(user_object, update, update.message.text)
