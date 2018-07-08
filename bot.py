@@ -94,7 +94,7 @@ class Bot:
 
         if update.message.text and update.message.from_user:
             print("[" + group.group_name + "] " + get_username_or_name_sb(
-                update.message.from_user) + ":" + update.message.text)
+                update.message.from_user) + ": " + update.message.text)
 
         if settings_object.delete_messages:
             if settings_object.delete_messages_seconds > 0:
