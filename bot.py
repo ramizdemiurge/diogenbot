@@ -81,14 +81,9 @@ class Bot:
         if left_chat_detector(bot, update):
             return
 
-        try:
-            if update.message.new_chat_members:
-                print("New chat members method.")
-                new_users(update.message.new_chat_members, _chat_id)
-                return
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
+        if update.message.new_chat_members:
+            new_users(update.message.new_chat_members, _chat_id)
+            return
 
         if update.message.sticker:
             self._group_sticker_handler(bot, update)
