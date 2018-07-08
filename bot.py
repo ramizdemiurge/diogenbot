@@ -91,8 +91,10 @@ class Bot:
         user_object = get_user(bot, update)
         settings_object = group.settings
         interest_detector(bot, update, settings_object)
-        if update.message.text:
-            print("Сообщение: " + update.message.text)
+
+        if update.message.text and update.message.from_user:
+            print("[" + group.group_name + "] " + get_username_or_name_sb(
+                update.message.from_user) + ":" + update.message.text)
 
         if settings_object.delete_messages:
             if settings_object.delete_messages_seconds > 0:
