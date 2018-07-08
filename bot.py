@@ -90,7 +90,7 @@ class Bot:
         group = get_group(bot, update)
         user_object = get_user(bot, update)
         settings_object = group.settings
-        interest_detector(bot, update, settings_object)
+        interest_detector(bot, update, group)
 
         if update.message.text and update.message.from_user:
             print("[" + group.group_name + "] " + get_username_or_name_sb(

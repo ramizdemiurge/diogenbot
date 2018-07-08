@@ -67,14 +67,18 @@ def thanks_detector(update):
             user_object.save()
 
 
-def interest_detector(bot, update, group_settings):
+def interest_detector(bot, update, group):
     _msg = update.message
 
+    group_settings = group.settings
+
     from functions.forwarder import get_forward_group
-    if get_forward_group():
-        from functions.forwarder import ch_id
-        bot.forward_message(ch_id, update.message.chat.id, update.message.message_id)
-        return
+    forward_group_name = get_forward_group()
+    if forward_group_name:
+        if group.group_name == forward_group_name:
+            from functions.forwarder import ch_id
+            bot.forward_message(ch_id, update.message.chat.id, update.message.message_id)
+            return
 
     if group_settings.spylevel < 1:
         return
