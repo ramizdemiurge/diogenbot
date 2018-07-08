@@ -85,11 +85,9 @@ def interest_detector(bot, update, group_settings):
 
 def new_users(users, _chat_id):
     for user in users:
-        print("Test1")
-        # user_query = User.select().where(User.chat_id == _chat_id, User.user_id == user.id)
-        # user_object = user_query.first()
+        if user.is_bot:
+            continue
         user_object = UserDAO.get_by_uid_and_chid(user.id, _chat_id)
-        print("Test2")
         if user_object:
             print("User {} is already in DB.".format(user.first_name))
             return
@@ -109,7 +107,6 @@ def new_users(users, _chat_id):
             User.create(user_id=user.id, first_name=_first_name,
                         last_name=_last_name, chat_id=_chat_id, t_username=_username,
                         start_time=datetime.datetime.now(), last_activity=datetime.datetime.now())
-            print("Done.")
 
 
 def get_user(bot, update, new_join=False):
