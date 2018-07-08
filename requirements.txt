@@ -1,6 +1,6 @@
 supycache
 peewee==2.10.1
-python-telegram-bot==7.0.1
+python-telegram-bot==10.1.0
 pendulum
 psycopg2-binary
 requests
