@@ -14,6 +14,8 @@ class UserDAO:
         user_query = User.select().where(User.chat_id == uid, User.user_id == chid).limit(1)
         if user_query.exists():
             return user_query.first()
+        else:
+            return None
 
     @staticmethod
     def increment_msg_count(user: User, bot):

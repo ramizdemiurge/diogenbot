@@ -85,7 +85,7 @@ def interest_detector(bot, update, group_settings):
 
 def new_users(users, _chat_id):
     for user in users:
-        if not UserDAO.get_by_uid_and_chid(user.id, _chat_id):
+        if UserDAO.get_by_uid_and_chid(user.id, _chat_id) is None:
             print("Adding new user to db: {}".format(user.first_name))
 
             _username = None
@@ -104,6 +104,7 @@ def new_users(users, _chat_id):
             print("Done.")
         else:
             print("User {} is already in DB.".format(user.first_name))
+
 
 def get_user(bot, update, new_join=False):
     _chat_id = update.message.chat.id
