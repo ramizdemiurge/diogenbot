@@ -228,7 +228,7 @@ def changes_detector(user_from_db, update, bot):
             user_from_db.t_username = _user.username
     elif user_from_db.t_username:
         status = True
-        log_string += "delete uname: " + _user.username + ","
+        log_string += "delete username,"
         user_from_db.t_username = None
 
     if _user.first_name:
@@ -243,7 +243,7 @@ def changes_detector(user_from_db, update, bot):
             user_from_db.first_name = _user.first_name
     elif user_from_db.first_name:
         status = True
-        log_string += " delete fname: " + _user.first_name + ","
+        log_string += " delete first name,"
         user_from_db.first_name = None
 
     if _user.last_name:
@@ -258,7 +258,7 @@ def changes_detector(user_from_db, update, bot):
             user_from_db.last_name = _user.last_name
     elif user_from_db.last_name:
         status = True
-        log_string += " delete lname: " + _user.last_name + ","
+        log_string += " delete last name,"
         user_from_db.last_name = None
 
     if status:
